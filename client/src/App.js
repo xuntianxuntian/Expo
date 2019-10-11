@@ -1,5 +1,6 @@
 import React from 'react'
 import { Layout, Menu, Breadcrumb, Icon, Typography, Dropdown, Badge } from 'antd'
+import CurrentExpo from './components/contentLayout/expoList/CurrentExpo'
 
 class App extends React.Component {
   constructor(props) {
@@ -110,12 +111,12 @@ class App extends React.Component {
             <Content
               style={{
                 background: '#fff',
-                padding: 24,
+                padding: 0,
                 margin: 0,
-                mHeight: '100%',
+                Height: '100%',
               }}
             >
-              Content
+              <CurrentExpo/>
         </Content>
           <Footer style={{ textAlign: 'center',width:'100%', position:'fixed',bottom:'0px'}}>云展科技 ©2019 Created by 武汉多人行展览服务有限公司</Footer>
           </Layout>
