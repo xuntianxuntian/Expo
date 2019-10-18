@@ -1,9 +1,9 @@
-import React,{useState} from 'react'
+import React, { useState } from 'react'
 import { List, Avatar, Icon, Button } from 'antd';
 
 const ExpoList = (props) => {
     const listData = props.dataSource;
-    const [pageNum,setPageNum] = useState(1)
+    const [pageNum, setPageNum] = useState(1)
     // console.log(props)
     const iconpng = (<Icon type="play-circle" />)
 
@@ -15,7 +15,7 @@ const ExpoList = (props) => {
     )
 
     const pagination = {
-        current:pageNum,
+        current: pageNum,
         onChange: page => {
             setPageNum(page)
         },
@@ -24,7 +24,7 @@ const ExpoList = (props) => {
 
     const footer = (<div><b>ant design</b> footer part</div>)
     const actions = [
-       
+
     ]
 
 
@@ -34,7 +34,7 @@ const ExpoList = (props) => {
         return (
             <List.Item
                 key={item.expoTitle}
-                actions={[<Button type = 'primary' ket={item.expoId}>添加展会</Button>]}
+                actions={[<Button type='primary' ket={item.expoId}>添加展会</Button>]}
                 extra={(<img
                     width={272}
                     alt="logo"
