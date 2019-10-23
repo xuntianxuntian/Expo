@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const validateLoginData = require('../../utils/login.validator')
 require('dotenv').config()
 
 const User = require('../../models/User/User.model')
@@ -9,6 +10,8 @@ const User = require('../../models/User/User.model')
 
 
 router.post('/', (req, res) => {
+    const {isValid,errors} = validateLoginData(req.body)
+    if(!isValid) return res.status(400).json(errors)
     const { email, password } = req.body
     User.find({ email })
         .then(users => {
@@ -26,7 +29,7 @@ router.post('/', (req, res) => {
                                 (err, token) => {
                                     if(err) throw  err
                                     return res.json({
-                                        message:"Token Success",
+                                        message:"Login Success",
                                         token:"Bearer " + token
                                     })
                                 })

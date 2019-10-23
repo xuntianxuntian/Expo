@@ -2,11 +2,14 @@ const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const validateRegisterData = require('../../utils/register.validator')
 require('dotenv').config()
 
 const User = require('../../models/User/User.model')
 
 router.post('/', (req, res) => {
+    const { isValid, errors } = validateRegisterData(req.body)
+    if (!isValid) return res.status(400).json(errors)
     User.find({ email: req.body.email })
         .then(users => {
             if (users.length) {
@@ -20,7 +23,6 @@ router.post('/', (req, res) => {
                     tel: req.body.tel,
                     password: req.body.password
                 })
-
                 bcrypt.genSalt(10, (err, salt) => {
                     bcrypt.hash(newUser.password, salt, (err, hash) => {
                         if (err) throw err
