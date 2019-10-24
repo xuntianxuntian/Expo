@@ -1,5 +1,6 @@
 import React from 'react'
 import { Layout, Menu,  Icon } from 'antd'
+import { Link } from 'react-router-dom'
 
 
 
@@ -27,8 +28,10 @@ export const SiderBar = (props) => {
                         </span>
                     }
                 >
-                    <Menu.Item key="1">当前展会选择</Menu.Item>
-                    <Menu.Item key="2">展会添加</Menu.Item>
+                    <Menu.Item key="1">我的展会</Menu.Item>
+                    <Menu.Item key="2">
+                        <Link to = "/queryExpo">展会查询</Link>
+                    </Menu.Item>
                 </SubMenu>
                 <SubMenu
                     key="sub2"

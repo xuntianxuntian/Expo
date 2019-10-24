@@ -1,8 +1,8 @@
 import React from 'react'
 import UserLayout from './components/userLayout/index'
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom'
-import Login from './components/login/Login.component';
 import {AuthRoute} from './components/utils/AuthRoute'
+import AuthComponent from './components/auth/index.authComponent';
 
 
 class App extends React.Component {
@@ -16,7 +16,7 @@ class App extends React.Component {
       <Router>
         <Switch>
           <Route path='/login'>
-            <Login />
+            <AuthComponent />
           </Route>
           <AuthRoute path='/' >
             <UserLayout />

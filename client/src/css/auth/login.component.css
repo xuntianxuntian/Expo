@@ -1,0 +1,22 @@
+.login input{
+    height: 40px;
+}
+
+
+.login-form-forgot{
+    float: right;
+}
+
+.login-form-forgot span{
+    color: grey;
+    margin:0 8px 0 5px;
+}
+
+.login-form-button{
+    width:100%;
+    height: 40px;
+    /* margin: 0 50px; */
+    text-align: center;
+    padding:8px 0 8px 0;
+    /* padding: 5px 100px; */
+}
