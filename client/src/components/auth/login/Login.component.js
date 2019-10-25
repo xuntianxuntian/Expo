@@ -1,6 +1,11 @@
 import React from 'react'
 import { Form, Icon, Input, Button, Checkbox } from 'antd';
 import { Link, Route } from 'react-router-dom'
+
+import { connect } from 'react-redux'
+import { loginReducer } from '../../../reducers/auth/login.reducer'
+import loginUser from '../../../actions/login/login.action'
+
 import '../../../css/auth/login.component.css'
 
 class NormalLoginForm extends React.Component {
@@ -10,6 +15,7 @@ class NormalLoginForm extends React.Component {
       if (!err) {
         console.log('Received values of form: ', values);
       }
+      this.state.loginUser(values)
     });
   };
 
@@ -46,9 +52,9 @@ class NormalLoginForm extends React.Component {
                 initialValue: true,
               })(<Checkbox>记住密码</Checkbox>)}
               <div className="login-form-forgot">
-                <Link  to="">忘记密码?</Link>
-                <span>or</span> 
-                <Link  to="">现在注册</Link>
+                <Link to="">忘记密码?</Link>
+                <span>or</span>
+                <Link to="">现在注册</Link>
               </div>
             </div>
 
@@ -64,4 +70,6 @@ class NormalLoginForm extends React.Component {
 }
 
 const Login = Form.create({ name: 'normal_login' })(NormalLoginForm);
-export default Login
+
+
+export default connect({},loginUser)(Login)

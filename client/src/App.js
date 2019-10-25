@@ -1,8 +1,15 @@
 import React from 'react'
 import UserLayout from './components/userLayout/index'
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom'
-import {AuthRoute} from './components/utils/AuthRoute'
+
+import { Provider } from 'react-redux'
+import store from './store'
+
+
+import { AuthRoute } from './components/utils/AuthRoute'
 import AuthComponent from './components/auth/index.authComponent';
+
+
 
 
 class App extends React.Component {
@@ -13,17 +20,18 @@ class App extends React.Component {
 
   render() {
     return (
-      <Router>
-        <Switch>
-          <Route path='/login'>
-            <AuthComponent />
-          </Route>
-          <AuthRoute path='/' >
-            <UserLayout />
-          </AuthRoute>
-        </Switch>
-      </Router>
-
+      <Provider store={store}>
+        <Router>
+          <Switch>
+            <Route path='/login'>
+              <AuthComponent />
+            </Route>
+            <AuthRoute path='/' >
+              <UserLayout />
+            </AuthRoute>
+          </Switch>
+        </Router>
+      </Provider>
     )
   }
 
