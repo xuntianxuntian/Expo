@@ -3,6 +3,7 @@ import axios from 'axios'
 import setAuthorization from '../../utils/setAuthorization'
 
 const loginUser = (userData) => dispatch => {
+    console.log('assssssss')
     axios.post('/login', userData)
         .then(res => {
             const { token } = res.data
@@ -14,6 +15,7 @@ const loginUser = (userData) => dispatch => {
             })
         })
         .catch(err => {
+            console.log(err)
             dispatch({
                 type: LOGIN_ERROR,
                 payload: err.data

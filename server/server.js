@@ -34,7 +34,7 @@ const loginRouter = require('./routes/api/login.route')
 const registerRouter = require('./routes/api/register.route')
 
 
-
+console.log('1111111')
 //  Use Routes
 app.use('/login',loginRouter)
 app.use('/register',registerRouter)

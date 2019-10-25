@@ -15,7 +15,7 @@ class NormalLoginForm extends React.Component {
       if (!err) {
         console.log('Received values of form: ', values);
       }
-      this.state.loginUser(values)
+      this.props.loginUser(values)
     });
   };
 
@@ -25,7 +25,7 @@ class NormalLoginForm extends React.Component {
       <div className="login">
         <Form onSubmit={this.handleSubmit} className="login-form" >
           <Form.Item>
-            {getFieldDecorator('username', {
+            {getFieldDecorator('email', {
               rules: [{ required: true, message: '请输入邮箱或手机号码' }],
             })(
               <Input
@@ -69,7 +69,11 @@ class NormalLoginForm extends React.Component {
   }
 }
 
+
+const mapStateToProps = state => ({
+  login:state.login
+})
 const Login = Form.create({ name: 'normal_login' })(NormalLoginForm);
 
 
-export default connect({},loginUser)(Login)
+export default connect(mapStateToProps,{loginUser})(Login)

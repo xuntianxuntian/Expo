@@ -44,7 +44,7 @@ class RegistrationForm extends React.Component {
     state = {
         confirmDirty: false,
         autoCompleteResult: [],
-    };
+    }
 
     handleSubmit = e => {
         e.preventDefault();
@@ -53,12 +53,12 @@ class RegistrationForm extends React.Component {
                 console.log('Received values of form: ', values);
             }
         });
-    };
+    }
 
     handleConfirmBlur = e => {
         const { value } = e.target;
         this.setState({ confirmDirty: this.state.confirmDirty || !!value });
-    };
+    }
 
     compareToFirstPassword = (rule, value, callback) => {
         const { form } = this.props;
@@ -67,7 +67,7 @@ class RegistrationForm extends React.Component {
         } else {
             callback();
         }
-    };
+    }
 
     validateToNextPassword = (rule, value, callback) => {
         const { form } = this.props;
@@ -75,7 +75,7 @@ class RegistrationForm extends React.Component {
             form.validateFields(['confirm'], { force: true });
         }
         callback();
-    };
+    }
 
     handleWebsiteChange = value => {
         let autoCompleteResult;
@@ -85,7 +85,7 @@ class RegistrationForm extends React.Component {
             autoCompleteResult = ['.com', '.org', '.net'].map(domain => `${value}${domain}`);
         }
         this.setState({ autoCompleteResult });
-    };
+    }
 
     render() {
         const { getFieldDecorator } = this.props.form;

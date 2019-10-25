@@ -10,6 +10,7 @@ const User = require('../../models/User/User.model')
 
 
 router.post('/', (req, res) => {
+    console.log('sadada')
     const {isValid,errors} = validateLoginData(req.body)
     if(!isValid) return res.status(400).json(errors)
     const { email, password } = req.body
