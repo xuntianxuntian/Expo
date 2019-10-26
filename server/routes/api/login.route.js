@@ -10,7 +10,7 @@ const User = require('../../models/User/User.model')
 
 
 router.post('/', (req, res) => {
-    console.log('sadada')
+    console.log('进入login.route')
     const {isValid,errors} = validateLoginData(req.body)
     if(!isValid) return res.status(400).json(errors)
     const { email, password } = req.body
@@ -22,7 +22,6 @@ router.post('/', (req, res) => {
                 bcrypt.compare(password, users[0].password)
                     .then(passwordMatch => {
                         if (passwordMatch) {
-                            console.log(process.env.JWT_KEY)
                             const jwtRule = { id: users[0].id, username: users[0].username }
                             jwt.sign(jwtRule,
                                 process.env.JWT_KEY,
@@ -43,6 +42,5 @@ router.post('/', (req, res) => {
         .catch(err => { console.log(err) })
 
 })
-
 
 module.exports = router
