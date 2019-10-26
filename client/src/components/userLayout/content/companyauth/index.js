@@ -1,11 +1,8 @@
 import {
     Form,
-    Select,
-    Input
 } from 'antd';
 import React from 'react'
 
-const { Option } = Select;
 
 class CompanyAuthForm extends React.Component {
 

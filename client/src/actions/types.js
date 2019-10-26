@@ -1,3 +1,6 @@
 
 export const LOGIN_IN = "LOGIN_IN"
-export const GET_ERROR = "GET_ERROR"
+export const LOGIN_ERROR = "LOGIN_ERROR"
+export const REGISTER_USER = "REGISTER_USER"
+export const REGISTER_ERROR = "REGISTER_ERROR"
+export const REGISTER_TO_LOGIN = "REGISTER_TO_LOGIN"

@@ -5,14 +5,13 @@ const ExpoList = (props) => {
     const listData = props.dataSource;
     const [pageNum, setPageNum] = useState(1)
     // console.log(props)
-    const iconpng = (<Icon type="play-circle" />)
 
-    const IconText = ({ type, text }) => (
-        <span>
-            <Icon type={type} style={{ marginRight: 8 }} />
-            {text}
-        </span>
-    )
+    // const IconText = ({ type, text }) => (
+    //     <span>
+    //         <Icon type={type} style={{ marginRight: 8 }} />
+    //         {text}
+    //     </span>
+    // )
 
     const pagination = {
         current: pageNum,
@@ -23,10 +22,7 @@ const ExpoList = (props) => {
     }
 
     const footer = (<div><b>ant design</b> footer part</div>)
-    const actions = [
-
-    ]
-
+    
 
 
 

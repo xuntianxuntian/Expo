@@ -1,95 +1,70 @@
 import React from 'react'
-import { Form, Input, Tooltip, Icon, Cascader, Select, Row, Col, Checkbox, Button, AutoComplete, } from 'antd';
-import  '../../../css/auth/register.component.css'
+import { Form, Input, Tooltip, Icon, Select, Row, Col, Checkbox, Button, Spin,Result } from 'antd';
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import registerUser from '../../../actions/register/register.action'
+import registerToLogin from '../../../actions/register/registerToLogin.action'
+import PropTypes from 'prop-types'
+import '../../../css/auth/register.component.css'
 
 const { Option } = Select;
-const AutoCompleteOption = AutoComplete.Option;
-
-const residences = [
-    {
-        value: 'zhejiang',
-        label: 'Zhejiang',
-        children: [
-            {
-                value: 'hangzhou',
-                label: 'Hangzhou',
-                children: [
-                    {
-                        value: 'xihu',
-                        label: 'West Lake',
-                    },
-                ],
-            },
-        ],
-    },
-    {
-        value: 'jiangsu',
-        label: 'Jiangsu',
-        children: [
-            {
-                value: 'nanjing',
-                label: 'Nanjing',
-                children: [
-                    {
-                        value: 'zhonghuamen',
-                        label: 'Zhong Hua Men',
-                    },
-                ],
-            },
-        ],
-    },
-];
 
 class RegistrationForm extends React.Component {
     state = {
         confirmDirty: false,
         autoCompleteResult: [],
+        error: {},
+        isFetching: false,
+        registerDone: false
     }
 
-    handleSubmit = e => {
+    handleSubmit = async (e) => {
         e.preventDefault();
-        this.props.form.validateFieldsAndScroll((err, values) => {
-            if (!err) {
-                console.log('Received values of form: ', values);
-            }
-        });
+        this.setState({
+            ...this.state,
+            isFetching: true
+        })
+        const { email, password, password2, tel, username, company, captcha } = this.props.form.getFieldsValue()
+        await this.props.registerUser({ email, password, password2, tel, username, company, captcha }, this.props.history)
+        this.setState({
+            ...this.state,
+            isFetching: this.props.register.success,
+            registerDone: this.props.register.success
+        })
     }
 
-    handleConfirmBlur = e => {
-        const { value } = e.target;
-        this.setState({ confirmDirty: this.state.confirmDirty || !!value });
+    changeTab = (e)=>{
+        this.props.registerToLogin('1')
     }
 
-    compareToFirstPassword = (rule, value, callback) => {
-        const { form } = this.props;
-        if (value && value !== form.getFieldValue('password')) {
-            callback('Two passwords that you enter is inconsistent!');
-        } else {
-            callback();
-        }
+    async componentWillReceiveProps(nextProp) {
+        const error = nextProp.register.error
+        await this.setState({
+            error
+        })
     }
 
-    validateToNextPassword = (rule, value, callback) => {
-        const { form } = this.props;
-        if (value && this.state.confirmDirty) {
-            form.validateFields(['confirm'], { force: true });
-        }
-        callback();
-    }
+    // compareToFirstPassword = (rule, value, callback) => {
+    //     const { form } = this.props;
+    //     if (value && value !== form.getFieldValue('password')) {
+    //         callback('Two passwords that you enter is inconsistent!');
+    //     } else {
+    //         callback();
+    //     }
+    // }
 
-    handleWebsiteChange = value => {
-        let autoCompleteResult;
-        if (!value) {
-            autoCompleteResult = [];
-        } else {
-            autoCompleteResult = ['.com', '.org', '.net'].map(domain => `${value}${domain}`);
-        }
-        this.setState({ autoCompleteResult });
-    }
+    // validateToNextPassword = (rule, value, callback) => {
+    //     const { form } = this.props;
+    //     if (value && this.state.confirmDirty) {
+    //         form.validateFields(['confirm'], { force: true });
+    //     }
+    //     callback();
+    // }
+
 
     render() {
         const { getFieldDecorator } = this.props.form;
-        const { autoCompleteResult } = this.state;
+        const spinIcon = <Icon type={this.state.registerDone ? "check" : "loading"} style={{ fontSize: 24 }} />
 
         const formItemLayout = {
             labelCol: {
@@ -122,100 +97,145 @@ class RegistrationForm extends React.Component {
             </Select>,
         );
 
-        const websiteOptions = autoCompleteResult.map(website => (
-            <AutoCompleteOption key={website}>{website}</AutoCompleteOption>
-        ));
 
-        return (
-            <Form {...formItemLayout} onSubmit={this.handleSubmit}>
-                <Form.Item label="邮箱">
-                    {getFieldDecorator('email', {
-                        rules: [
-                            {
-                                type: 'email',
-                                message: '请输入正确的邮箱',
-                            },
-                            {
-                                required: true,
-                                message: '请输入邮箱!',
-                            },
-                        ],
-                    })(<Input />)}
-                </Form.Item>
-                <Form.Item label="密码" hasFeedback>
-                    {getFieldDecorator('password', {
-                        rules: [
-                            {
-                                required: true,
-                                message: '请输入密码',
-                            },
-                            {
-                                validator: this.validateToNextPassword,
-                            },
-                        ],
-                    })(<Input.Password />)}
-                </Form.Item>
-                <Form.Item label="确认密码" hasFeedback>
-                    {getFieldDecorator('confirm', {
-                        rules: [
-                            {
-                                required: true,
-                                message: '请输入确认密码',
-                            },
-                            {
-                                validator: this.compareToFirstPassword,
-                            },
-                        ],
-                    })(<Input.Password onBlur={this.handleConfirmBlur} />)}
-                </Form.Item>
-                <Form.Item
-                    label={
-                        <span>
-                            公司名称&nbsp;
-                            <Tooltip title="场馆服务商/搭建商/参展商 ：公司名称">
-                                <Icon type="question-circle-o" />
-                            </Tooltip>
-                        </span>
-                    }
-                >
-                    {getFieldDecorator('nickname', {
-                        rules: [{ required: true, message: '请输入公司全称', whitespace: true }],
-                    })(<Input />)}
-                </Form.Item>
-                <Form.Item label="手机">
-                    {getFieldDecorator('phone', {
-                        rules: [{ required: true, message: 'Please input your phone number!' }],
-                    })(<Input addonBefore={prefixSelector} style={{ width: '100%' }} />)}
-                </Form.Item>
-                <Form.Item label="验证码" extra="We must make sure that your are a human.">
-                    <Row gutter={8}>
-                        <Col span={12}>
-                            {getFieldDecorator('captcha', {
-                                rules: [{ required: true, message: 'Please input the captcha you got!' }],
-                            })(<Input />)}
-                        </Col>
-                        <Col span={12}>
-                            <Button>发送验证码</Button>
-                        </Col>
-                    </Row>
-                </Form.Item>
-                <Form.Item {...tailFormItemLayout}>
-                    {getFieldDecorator('agreement', {
-                        valuePropName: 'checked',
-                    })(
-                        <Checkbox>
-                            I have read the <a href="">agreement</a>
-                        </Checkbox>,
-                    )}
-                </Form.Item>
-                <Form.Item {...tailFormItemLayout}>
-                    <Button type="primary" htmlType="submit">
-                        注册
-            </Button>
-                </Form.Item>
-            </Form>
+
+        return (this.state.registerDone ? (
+            <Result
+                status="success"
+                title = {'注册成功！欢迎 '+this.props.register.user.email}
+                subTitle=""
+                extra={[
+                    <Button type="primary" key="console" onClick={this.changeTab}>
+                        马上登录
+                    </Button>
+                    
+                ]}
+            />
+        ) : (<Form {...formItemLayout} onSubmit={this.handleSubmit}>
+            <Form.Item label="邮箱"
+                extra={this.state.error.email ? this.state.error.email : ''}
+                validateStatus={this.props.register.error.email ? 'error' : ''}
+            >
+                {getFieldDecorator('email', {
+                    rules: [
+                        // {
+                        //     type: 'email',
+                        //     message: '请输入正确的邮箱',
+                        // },
+                        {
+                            required: true,
+                            message: '请输入邮箱!',
+                        },
+                    ],
+                })(<Input />)}
+            </Form.Item>
+            <Form.Item label="密码" hasFeedback
+                extra={this.state.error.password ? this.state.error.password : ''}
+                validateStatus={this.props.register.error.password ? 'error' : ''}
+            >
+                {getFieldDecorator('password', {
+                    rules: [
+                        {
+                            required: true,
+                            message: '请输入密码',
+                        },
+                        {
+                            validator: this.validateToNextPassword,
+                        },
+                    ],
+                })(<Input.Password />)}
+            </Form.Item>
+            <Form.Item label="确认密码" hasFeedback
+                extra={this.state.error.password2 ? this.state.error.password2 : ''}
+                validateStatus={this.props.register.error.password2 ? 'error' : ''}
+            >
+                {getFieldDecorator('password2', {
+                    rules: [
+                        {
+                            required: true,
+                            message: '请输入确认密码',
+                        },
+                        {
+                            validator: this.compareToFirstPassword,
+                        },
+                    ],
+                })(<Input.Password onBlur={this.handleConfirmBlur} />)}
+            </Form.Item>
+            <Form.Item
+                label={
+                    <span>
+                        公司名称&nbsp;
+                                <Tooltip title="场馆服务商/搭建商/参展商 ：公司名称">
+                            <Icon type="question-circle-o" />
+                        </Tooltip>
+                    </span>
+                }
+                extra={this.state.error.company ? this.state.error.company : ''}
+                validateStatus={this.props.register.error.company ? 'error' : ''}
+            >
+                {getFieldDecorator('company', {
+                    rules: [{ required: true, message: '请输入公司全称', whitespace: true }],
+                })(<Input />)}
+            </Form.Item>
+            <Form.Item label="手机"
+                extra={this.state.error.tel ? this.state.error.tel : ''}
+                validateStatus={this.props.register.error.tel ? 'error' : ''}
+            >
+                {getFieldDecorator('tel', {
+                    rules: [{ required: true, message: 'Please input your phone number!' }],
+                })(<Input addonBefore={prefixSelector} style={{ width: '100%' }} />)}
+            </Form.Item>
+            <Form.Item label="验证码"
+                extra={this.state.error.captcha ? this.state.error.captcha : ''}
+                validateStatus={this.props.register.error.captcha ? 'error' : ''}
+            >
+                <Row gutter={8}>
+                    <Col span={12}>
+                        {getFieldDecorator('captcha', {
+                            rules: [{ required: true, message: 'Please input the captcha you got!' }],
+                        })(<Input />)}
+                    </Col>
+                    <Col span={12}>
+                        <Button>发送验证码</Button>
+                    </Col>
+                </Row>
+            </Form.Item>
+            <Form.Item {...tailFormItemLayout}>
+                {getFieldDecorator('agreement', {
+                    valuePropName: 'checked',
+                })(
+                    <Checkbox>
+                        I have read the <a href="">agreement</a>
+                    </Checkbox>,
+                )}
+            </Form.Item>
+            <Form.Item {...tailFormItemLayout}>
+                <Button type="primary" htmlType="submit"     className="register-form-button">
+                    注册
+                        </Button>
+                {this.state.isFetching ? <Spin indicator={spinIcon} size="large" /> : ''}
+            </Form.Item>
+        </Form>)
+
+
+
         );
     }
 }
 
-export const RegisterForm = Form.create({ name: 'register' })(RegistrationForm);
+const mapStateToProps = state => ({
+    register: state.register,
+    toLogin:state.toLogin
+})
+
+const RegisterForm = Form.create({ name: 'register' })(RegistrationForm);
+
+RegisterForm.propTypes = {
+    register: PropTypes.object.isRequired,
+    registerUser: PropTypes.func.isRequired,
+    toLogin: PropTypes.object.isRequired,
+    registerToLogin: PropTypes.func.isRequired,
+}
+
+
+export default connect(mapStateToProps, { registerUser,registerToLogin })(withRouter(RegisterForm))

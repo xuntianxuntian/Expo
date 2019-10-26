@@ -1,5 +1,5 @@
 import React from 'react'
-import { Form, Icon, Input, Button, Checkbox } from 'antd';
+import { Form, Icon, Input, Button, Checkbox, Spin } from 'antd';
 import { Link, withRouter } from 'react-router-dom'
 
 import PropTypes from 'prop-types'
@@ -7,57 +7,59 @@ import { connect } from 'react-redux'
 import loginUser from '../../../actions/login/login.action'
 
 import '../../../css/auth/login.component.css'
-import Axios from 'axios';
 
 class NormalLoginForm extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      error: {}
+      error: {},
+      isFetching: false
     }
   }
 
   handleSubmit = async (e) => {
     e.preventDefault();
-    await this.props.form.validateFields((err, values) => {
-      if (err) return
-      this.props.loginUser(values, this.props.history)
-    })
-    const error = this.props.login.error
     this.setState({
+      ...this.state,
+      isFetching: true
+    })
+    // this.props.form.validateFields((err, values) => {
+
+    // })
+    const { email, password } = this.props.form.getFieldsValue()
+    await this.props.loginUser({ email, password }, this.props.history)
+    this.setState({
+      ...this.state,
+      isFetching: this.props.login.isAuthorized
+    })
+  }
+
+  // componentWillMount() {
+  //   if (localStorage.token) {
+  //     this.props.history.push('/')
+  //   }
+  // }
+  async componentWillReceiveProps(nextProp) {
+    const error = nextProp.login.error
+    await this.setState({
       error
     })
-    console.log(error.password)
-  }
-
-  validatorInput = (rule, value, callback) => {
-    let err = this.state.error.password
-    console.log('111111' + err)
-    if (err) {
-      callback('asdad')
-    } else {
-      callback()
-    }
-  }
-
-  componentWillMount() {
-    if (localStorage.token) {
-      this.props.history.push('/')
-    }
-  }
-  componentWillReceiveProps(nextProp) {
-
-
   }
 
   render() {
+
+    const spinIcon = <Icon type={this.state.registerDone ? "check" : "loading"} style={{ fontSize: 24, color: "white" }} />
     const { getFieldDecorator } = this.props.form;
+
     return (
       <div className="login">
         <Form onSubmit={this.handleSubmit} className="login-form" >
-          <Form.Item>
+          <Form.Item
+            extra={this.state.error.email ? this.state.error.email : ''}
+            validateStatus={this.props.login.error.email ? 'error' : ''}
+          >
             {getFieldDecorator('email', {
-              rules: [{ required: true, message: '请输入邮箱或手机号码' }, { validator: (rule, value, callback) => callback(this.state.error.password) }],
+              // rules: [{ required: true, message: '请输入邮箱或手机号码' }],
             })(
               <Input
                 prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
@@ -65,16 +67,19 @@ class NormalLoginForm extends React.Component {
               />,
             )}
           </Form.Item>
-          <Form.Item>
+          <Form.Item
+            extra={this.state.error.password ? this.state.error.password : ''}
+            validateStatus={this.props.login.error.password ? 'error' : ''}
+          >
             {getFieldDecorator('password', {
-              rules: [{ required: true, message: '请输入密码' }],
+              // rules: [{ required: true, message: '请输入密码' }],
             })(
-              <div><Input
+              <Input
                 prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
                 type="password"
                 placeholder="请输入密码"
-              /><div>{this.state.error.password ? "密码错误" : ""}</div></div>
-              ,
+              />
+          ,
             )}
           </Form.Item>
           <Form.Item>
@@ -82,7 +87,7 @@ class NormalLoginForm extends React.Component {
               {getFieldDecorator('remember', {
                 valuePropName: 'checked',
                 initialValue: true,
-              })(<Checkbox>记住密码{this.state.error.password}</Checkbox>)}
+              })(<Checkbox>记住密码</Checkbox>)}
               <div className="login-form-forgot">
                 <Link to="">忘记密码?</Link>
                 <span>or</span>
@@ -92,12 +97,13 @@ class NormalLoginForm extends React.Component {
 
           </Form.Item>
           <Button type="primary" htmlType="submit" className="login-form-button">
-            登录
+            登录{this.state.isFetching ? <Spin indicator={spinIcon} size="large" /> : ''}
           </Button>
+
         </Form>
       </div>
 
-    );
+    )
   }
 }
 

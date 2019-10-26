@@ -1,24 +1,27 @@
 import React from 'react'
+import PropTypes from 'prop-types'
+import { connect} from 'react-redux'
 import '../../css/auth/index.css'
 import Login from './login/Login.component';
-import { RegisterForm } from './register/Register.component'
+import  RegisterForm  from './register/Register.component'
+import registerToLogin from '../../actions/register/registerToLogin.action'
 import { Tabs,Icon } from 'antd'
 
-export default class AuthComponent extends React.Component {
+ class AuthComponent extends React.Component {
 
-
+    changeTab = (tabKey)=>{
+        this.props.registerToLogin(tabKey.toString())
+    }
 
     render() {
-
-
         const { TabPane } = Tabs;
-
+        console.log(this.props)
         return (
             <div className="container">
                 <div className="sider-access">
                     <h2>会务管理系统入口</h2>
                     <div className="loginContainer">
-                        <Tabs defaultActiveKey="1">
+                        <Tabs defaultActiveKey='1' activeKey={this.props.toLogin.tabKey} onTabClick = {this.changeTab}>
                             <TabPane
                                 tab={
                                     <span className = "loginTab">
@@ -46,3 +49,17 @@ export default class AuthComponent extends React.Component {
         )
     }
 }
+
+const mapStateToProps = state => ({
+    toLogin:state.toLogin
+
+})
+
+
+AuthComponent.propTypes = {
+    toLogin:PropTypes.object.isRequired,
+    registerToLogin: PropTypes.func.isRequired,
+}
+
+
+export default connect(mapStateToProps, { registerToLogin })(AuthComponent)

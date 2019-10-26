@@ -17,21 +17,33 @@ router.post('/', (req, res) => {
                     email: "邮箱已被注册！"
                 })
             } else {
-                const newUser = new User({
-                    username: req.body.username,
-                    email: req.body.email,
-                    tel: req.body.tel,
-                    password: req.body.password
-                })
-                bcrypt.genSalt(10, (err, salt) => {
-                    bcrypt.hash(newUser.password, salt, (err, hash) => {
-                        if (err) throw err
-                        newUser.password = hash
-                        newUser.save()
-                            .then(user => res.json(user))
-                            .catch(err => console.log(err))
-                    })
-                })
+                User.find({ tel: req.body.tel })
+                    .then(
+                        users => {
+                            if (users.length) {
+                                return res.status(400).json({
+                                    tel: "电话号码已被注册"
+                                })
+                            } else {
+                                const newUser = new User({
+                                    // username: req.body.username,
+                                    email: req.body.email,
+                                    tel: req.body.tel,
+                                    password: req.body.password,
+                                    company: req.body.company,
+                                    captcha: req.body.captcha
+                                })
+                                bcrypt.genSalt(10, (err, salt) => {
+                                    bcrypt.hash(newUser.password, salt, (err, hash) => {
+                                        if (err) throw err
+                                        newUser.password = hash
+                                        newUser.save()
+                                            .then(user => res.json(user))
+                                            .catch(err => console.log(err))
+                                    })
+                                })
+                            }
+                        })
             }
         })
         .catch(err => console.log(err))

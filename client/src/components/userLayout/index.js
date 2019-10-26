@@ -1,6 +1,6 @@
 import React from 'react'
-import { Route, BrowserRouter as Router, Switch } from 'react-router-dom'
-import { Layout, Menu, Breadcrumb, Icon, Typography, Dropdown, Badge } from 'antd'
+import { Route} from 'react-router-dom'
+import { Layout, Menu } from 'antd'
 import QueryExpo from './expoList/QueryExpo'
 import { NavBar } from './navbar/index'
 import { SiderBar } from './siderbar/index'

@@ -11,15 +11,15 @@ module.exports = validateLoginData = userData => {
 
 
     if (!Validator.isEmail(email)) {
-        errors.email = "邮箱不合法"
+        errors.email = "请输入正确的邮箱地址"
     }
 
     if (Validator.isEmpty(email)) {
-        errors.email = "邮箱不能为空"
+        errors.email = "请输入邮箱"
     }
 
     if (Validator.isEmpty(password)) {
-        errors.password = "密码不能为空"
+        errors.password = "请输入密码"
     }
 
     if (JSON.stringify(errors) === "{}") {

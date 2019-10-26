@@ -4,19 +4,27 @@ const Schema = mongoose.Schema
 const UserSchema = new Schema({
     username:{
         type:String,
-        required:true
+        // required:true
     },
     email:{
         type:String,
         required:true
     },
     tel:{
-        type:String
+        type:String,
+        required:true
     },
     password:{
         type:String,
         required:true
     },
+    company:{
+        type:String,
+        required:true
+    },
+    captcha:{
+        type:String
+    }
 },{timestamps:true})
 
 

@@ -5,3 +5,17 @@
 .ant-form-item-label{
     width:30%
 }
+
+.register-form-button{
+    width:200px;
+    height: 40px;
+    font-size: 16px;
+    /* margin: 0 50px; */
+    text-align: center;
+    padding:8px 0 8px 0;
+    /* padding: 5px 100px; */
+}
+
+.ant-tabs-content .ant-form-item{
+    margin-bottom: 12px;
+}

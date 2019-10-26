@@ -25,7 +25,7 @@ h2{
     width: 500px;
     float: right;
     background-color: rgba(255,255,255,0.9);
-    padding: 80px 50px
+    padding: 80px 50px 60px 30px
 }
 
 .container .ant-tabs-nav{

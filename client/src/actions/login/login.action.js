@@ -1,10 +1,10 @@
-import { LOGIN_IN,GET_ERROR } from '../types'
+import { LOGIN_IN,LOGIN_ERROR } from '../types'
 import axios from 'axios'
 import jwt_decode from 'jwt-decode'
 import setAuthorization from '../../utils/setAuthorization'
 
-const loginUser = (userData,history) => dispatch => {
-    axios.post('/login', userData)
+const loginUser = (userData,history) => async(dispatch) => {
+    await axios.post('/login', userData)
         .then(res => {
             const { token } = res.data
             const decode = jwt_decode(token)
@@ -22,14 +22,14 @@ const loginUser = (userData,history) => dispatch => {
             }
         })
         .catch(err => {
-            console.log(err.response.data)
+            // console.log(err.response.data)
             // if(err.response.data){
             //     const token = localStorage.token?localStorage.token:''
             //     delete localStorage.token
             //     setAuthorization(token)
             // }
             dispatch({
-                type: GET_ERROR,
+                type: LOGIN_ERROR,
                 payload: err.response.data
             })
         })
