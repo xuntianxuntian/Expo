@@ -22,7 +22,7 @@ router.post('/', (req, res) => {
                 bcrypt.compare(password, users[0].password)
                     .then(passwordMatch => {
                         if (passwordMatch) {
-                            const jwtRule = { id: users[0].id, username: users[0].username }
+                            const jwtRule = { id: users[0].id, username: users[0].username ,handler:users[0].handler,company:users[0].company}
                             jwt.sign(jwtRule,
                                 process.env.JWT_KEY,
                                 { expiresIn: 1800 },

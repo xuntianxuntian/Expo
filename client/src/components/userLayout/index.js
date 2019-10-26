@@ -1,11 +1,14 @@
 import React from 'react'
 import { Route} from 'react-router-dom'
+import { connect} from 'react-redux'
+import PropTypes from 'prop-types'
 import { Layout, Menu } from 'antd'
 import QueryExpo from './expoList/QueryExpo'
 import { NavBar } from './navbar/index'
-import { SiderBar } from './siderbar/index'
+import  SiderBar  from './siderbar/index'
 import { BreadCrumbList } from './content/breadcrumblist'
 import { CompanyAuth } from './content/companyauth';
+import loginUser from '../../actions/login/login.action'
 
 class UserLayout extends React.Component {
   constructor(props) {
@@ -16,24 +19,15 @@ class UserLayout extends React.Component {
   render() {
 
     const {  Content,  Footer } = Layout
+    console.log(this.props)
 
-
-    const userMenu = (<Menu
-      theme="dark"
-      mode="horizontal"
-      defaultSelectedKeys={['1']}
-      style={{ lineHeight: '64px', float: 'right' }}>
-      <Menu.Item key="1">nav 1</Menu.Item>
-      <Menu.Item key="2">nav 2</Menu.Item>
-      <Menu.Item key="3">nav 3</Menu.Item>
-    </Menu>)
 
 
     return (
       <Layout style={{ height: '100%' }}>
         <NavBar />
         <Layout height={'100%'}>
-          <SiderBar />
+          <SiderBar  handler = {this.props.login.user.handler} />
           <Layout style={{ padding: '0 24px 24px', height: '100%', paddingBottom: '100px' }}>
             <BreadCrumbList />
             <Content style={{ background: '#fff', padding: 0, margin: 0, height: '100%' }}>
@@ -46,7 +40,17 @@ class UserLayout extends React.Component {
       </Layout>
     );
   }
-
 }
 
-export default UserLayout;
+
+const mapStateToProps = state => ({
+  login: state.login
+
+})
+
+
+UserLayout.propTypes = {
+  login: PropTypes.object.isRequired,
+}
+
+export default connect(mapStateToProps, {  })(UserLayout)

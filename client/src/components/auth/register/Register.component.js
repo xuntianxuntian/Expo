@@ -13,7 +13,6 @@ class RegistrationForm extends React.Component {
     state = {
         confirmDirty: false,
         autoCompleteResult: [],
-        error: {},
         isFetching: false,
         registerDone: false
     }
@@ -37,12 +36,12 @@ class RegistrationForm extends React.Component {
         this.props.registerToLogin('1')
     }
 
-    async componentWillReceiveProps(nextProp) {
-        const error = nextProp.register.error
-        await this.setState({
-            error
-        })
-    }
+    // async componentWillReceiveProps(nextProp) {
+    //     const error = nextProp.register.error
+    //     await this.setState({
+    //         error
+    //     })
+    // }
 
     // compareToFirstPassword = (rule, value, callback) => {
     //     const { form } = this.props;
@@ -113,7 +112,7 @@ class RegistrationForm extends React.Component {
             />
         ) : (<Form {...formItemLayout} onSubmit={this.handleSubmit}>
             <Form.Item label="邮箱"
-                extra={this.state.error.email ? this.state.error.email : ''}
+                extra={this.props.register.error.email ? this.props.register.error.email : ''}
                 validateStatus={this.props.register.error.email ? 'error' : ''}
             >
                 {getFieldDecorator('email', {
@@ -130,7 +129,7 @@ class RegistrationForm extends React.Component {
                 })(<Input />)}
             </Form.Item>
             <Form.Item label="密码" hasFeedback
-                extra={this.state.error.password ? this.state.error.password : ''}
+                extra={this.props.register.error.password ? this.props.register.error.password : ''}
                 validateStatus={this.props.register.error.password ? 'error' : ''}
             >
                 {getFieldDecorator('password', {
@@ -146,7 +145,7 @@ class RegistrationForm extends React.Component {
                 })(<Input.Password />)}
             </Form.Item>
             <Form.Item label="确认密码" hasFeedback
-                extra={this.state.error.password2 ? this.state.error.password2 : ''}
+                extra={this.props.register.error.password2 ? this.props.register.error.password2 : ''}
                 validateStatus={this.props.register.error.password2 ? 'error' : ''}
             >
                 {getFieldDecorator('password2', {
@@ -170,7 +169,7 @@ class RegistrationForm extends React.Component {
                         </Tooltip>
                     </span>
                 }
-                extra={this.state.error.company ? this.state.error.company : ''}
+                extra={this.props.register.error.company ? this.props.register.error.company : ''}
                 validateStatus={this.props.register.error.company ? 'error' : ''}
             >
                 {getFieldDecorator('company', {
@@ -178,7 +177,7 @@ class RegistrationForm extends React.Component {
                 })(<Input />)}
             </Form.Item>
             <Form.Item label="手机"
-                extra={this.state.error.tel ? this.state.error.tel : ''}
+                extra={this.props.register.error.tel ? this.props.register.error.tel : ''}
                 validateStatus={this.props.register.error.tel ? 'error' : ''}
             >
                 {getFieldDecorator('tel', {
@@ -186,7 +185,7 @@ class RegistrationForm extends React.Component {
                 })(<Input addonBefore={prefixSelector} style={{ width: '100%' }} />)}
             </Form.Item>
             <Form.Item label="验证码"
-                extra={this.state.error.captcha ? this.state.error.captcha : ''}
+                extra={this.props.register.error.captcha ? this.props.register.error.captcha : ''}
                 validateStatus={this.props.register.error.captcha ? 'error' : ''}
             >
                 <Row gutter={8}>

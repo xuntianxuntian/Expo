@@ -5,9 +5,10 @@ import jwt_decode from 'jwt-decode'
 
 import { Provider } from 'react-redux'
 import store from './store'
+import {LOGIN_IN} from './actions/types'
 import setAuthorization from './utils/setAuthorization'
 
-import { AuthRoute } from './components/utils/AuthRoute'
+import { AuthRoute } from './routes/AuthRoute'
 import AuthComponent from './components/auth/index.authComponent';
 
 if (localStorage.token) {
@@ -15,8 +16,8 @@ if (localStorage.token) {
   const decode = jwt_decode(token)
   console.log(decode)
   store.dispatch({
-    type: "LOGIN_IN",
-    payload: token
+    type: LOGIN_IN,
+    payload: decode
   })
   setAuthorization(token)
 }
@@ -34,7 +35,7 @@ class App extends React.Component {
             <Route path='/login'>
               <AuthComponent />
             </Route>
-            <AuthRoute path='/' >
+            <AuthRoute path='/'  >
               <UserLayout />
             </AuthRoute>
           </Switch>

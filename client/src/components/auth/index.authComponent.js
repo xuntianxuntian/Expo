@@ -15,7 +15,6 @@ import { Tabs,Icon } from 'antd'
 
     render() {
         const { TabPane } = Tabs;
-        console.log(this.props)
         return (
             <div className="container">
                 <div className="sider-access">

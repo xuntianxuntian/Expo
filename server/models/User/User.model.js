@@ -24,6 +24,10 @@ const UserSchema = new Schema({
     },
     captcha:{
         type:String
+    },
+    handler:{
+        type:String,
+        default:'USER'
     }
 },{timestamps:true})
 

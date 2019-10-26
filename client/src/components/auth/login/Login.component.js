@@ -7,12 +7,12 @@ import { connect } from 'react-redux'
 import loginUser from '../../../actions/login/login.action'
 
 import '../../../css/auth/login.component.css'
+import isEmpty from '../../../utils/isEmpty';
 
 class NormalLoginForm extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      error: {},
       isFetching: false
     }
   }
@@ -23,39 +23,33 @@ class NormalLoginForm extends React.Component {
       ...this.state,
       isFetching: true
     })
-    // this.props.form.validateFields((err, values) => {
-
-    // })
+    
     const { email, password } = this.props.form.getFieldsValue()
     await this.props.loginUser({ email, password }, this.props.history)
-    this.setState({
-      ...this.state,
-      isFetching: this.props.login.isAuthorized
-    })
+    // await this.setState({
+    //   ...this.state,
+    //   isFetching: this.props.login.isAuthorized
+    // })
   }
 
-  // componentWillMount() {
-  //   if (localStorage.token) {
-  //     this.props.history.push('/')
-  //   }
+  
+  // async componentWillReceiveProps(nextProp) {
+  //   const error = nextProp.login.error
+  //   await this.setState({
+  //     error
+  //   })
   // }
-  async componentWillReceiveProps(nextProp) {
-    const error = nextProp.login.error
-    await this.setState({
-      error
-    })
-  }
 
   render() {
 
-    const spinIcon = <Icon type={this.state.registerDone ? "check" : "loading"} style={{ fontSize: 24, color: "white" }} />
+    const spinIcon = <Icon type={this.props.registerDone ? "check" : "loading"} style={{ fontSize: 24, color: "white" }} />
     const { getFieldDecorator } = this.props.form;
 
     return (
       <div className="login">
         <Form onSubmit={this.handleSubmit} className="login-form" >
           <Form.Item
-            extra={this.state.error.email ? this.state.error.email : ''}
+            extra={this.props.login.error.email ? this.props.login.error.email : ''}
             validateStatus={this.props.login.error.email ? 'error' : ''}
           >
             {getFieldDecorator('email', {
@@ -68,7 +62,7 @@ class NormalLoginForm extends React.Component {
             )}
           </Form.Item>
           <Form.Item
-            extra={this.state.error.password ? this.state.error.password : ''}
+            extra={this.props.login.error.password ? this.props.login.error.password : ''}
             validateStatus={this.props.login.error.password ? 'error' : ''}
           >
             {getFieldDecorator('password', {
@@ -97,9 +91,8 @@ class NormalLoginForm extends React.Component {
 
           </Form.Item>
           <Button type="primary" htmlType="submit" className="login-form-button">
-            登录{this.state.isFetching ? <Spin indicator={spinIcon} size="large" /> : ''}
+            登录{this.state.isFetching?<Spin indicator={spinIcon} size="small" />:''}
           </Button>
-
         </Form>
       </div>
 
