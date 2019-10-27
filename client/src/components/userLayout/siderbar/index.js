@@ -33,7 +33,9 @@ class SiderBar extends React.Component{
                         </span>
                     }
                 >
-                    <Menu.Item key="1">我的展会</Menu.Item>
+                    <Menu.Item key="1">
+                    <Link to = "/myExpo">我的展会</Link>
+                    </Menu.Item>
                     <Menu.Item key="2">
                         <Link to = "/queryExpo">展会查询</Link>
                     </Menu.Item>
@@ -84,7 +86,9 @@ class SiderBar extends React.Component{
                         </span>
                     }
                 >
-                    <Menu.Item key="1">我的展会</Menu.Item>
+                    <Menu.Item key="1">
+                    <Link to = "/myExpo">我的展会</Link>
+                    </Menu.Item>
                     <Menu.Item key="2">
                         <Link to = "/queryExpo">展会查询</Link>
                     </Menu.Item>

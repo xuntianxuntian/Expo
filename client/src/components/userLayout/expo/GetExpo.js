@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { Input } from 'antd'
-import ExpoList from './index';
+import ExpoList from './ExpoList';
 import axios from 'axios'
 
 const { Search } = Input
 
 
 
-const CurrentExpo = (props) => {
+const GetExpo = (props) => {
 
     const initialSearchValue = ''
     const initialDataSource = []
@@ -66,4 +66,4 @@ const CurrentExpo = (props) => {
         </div>
     )
 }
-export default CurrentExpo
+export default GetExpo
