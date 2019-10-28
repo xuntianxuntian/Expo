@@ -1,22 +1,23 @@
-import { LOGIN_IN,LOGIN_ERROR } from '../types'
-import axios from 'axios'
+import { LOGIN_IN, LOGIN_ERROR, STOP_LOADING } from '../types'
+import $axios from '../../axios'
+// import store from '../../store'
 import jwt_decode from 'jwt-decode'
 import setAuthorization from '../../utils/setAuthorization'
 
-const loginUser = (userData,history) => async(dispatch) => {
-    await axios.post('/login', userData)
+const loginUser = (userData, history) => async (dispatch) => {
+    await $axios.post('/login', true, userData)
         .then(res => {
+            dispatch({
+                type: STOP_LOADING
+            })
             const { token } = res.data
             const decode = jwt_decode(token)
-            if(token){
+            if (token) {
                 localStorage.setItem('token', token)
                 setAuthorization(token)
                 dispatch({
                     type: LOGIN_IN,
-                    payload: {
-                        token,
-                        decode
-                    }
+                    payload: decode
                 })
                 history.push('/')
             }
@@ -28,6 +29,9 @@ const loginUser = (userData,history) => async(dispatch) => {
             //     delete localStorage.token
             //     setAuthorization(token)
             // }
+            dispatch({
+                type: STOP_LOADING
+            })
             dispatch({
                 type: LOGIN_ERROR,
                 payload: err.response.data

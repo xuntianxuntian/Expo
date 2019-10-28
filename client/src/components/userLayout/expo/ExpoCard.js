@@ -1,6 +1,12 @@
 import React, { Component } from 'react'
 import { Card, Icon, Button } from 'antd'
+import { Link } from 'react-router-dom'
+import store from '../../../store'
+import {TOOGLE_SIDERBAR} from '../../../actions/types'
+
+
 import isEmpty from '../../../utils/isEmpty'
+import '../../../css/expo/expoCard.css'
 
 
 
@@ -15,60 +21,63 @@ class ExpoCard extends Component {
             metaTitle: '添加展会',
             metaDescription: ''
         }
-        console.log(this.props)
-        if (this.props.status === 'DEFAULT') {
-            // const initialState = {
-            //     imgSrc: '',//图片源
-            //     imgAlt: '', //图片的alt属性
-            //     operator: false,//下方action操作按钮的切换控制
-            //     metaTitle: '添加展会',
-            //     metaDescription: ''
-            // }
-            // this.setState({
-            //     ...this.state,
-            //     initialState
-            // })
-            return
-        } else {
-            this.setState({
-                imgSrc: this.props.expoInfo.expoImgSrc,
-                imgAlt: this.props.expoInfo.expoTitle,
-                operator: true,
-                metaTitle: this.props.expoInfo.expoTitle,
-                metaDescription: this.props.expoInfo.expoDescription,
-            })
-        }
+    }
 
+    onAddExpo = (e) =>{
+        store.dispatch({
+            type:TOOGLE_SIDERBAR,
+            patload:"getExpo"
+        })
     }
 
 
-
     render() {
-
         const { Meta } = Card
 
         return (
-            <div>
-                <Card
-                    style={{ width: 300 }}
-                    cover={
-                        isEmpty(this.state.imgSrc)?<Icon type="plus-circle" />:
-                        <img
-                            alt="example"
-                            src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
+            <div>{
+                isEmpty(this.props.expoInfo) ?
+                    <Card
+                        className = "add-container"
+                        style={{ width: 300 }}
+                        cover={
+                            <Icon type="plus-circle" />
+                        }
+                        actions={
+                            [<Button type="primary">查询展会</Button>]
+                        }
+                    >
+
+                        <Meta
+                            // avatar={<Icon type="" />}
+                            title={<Link to = "/getExpo" onClick={this.onAddExpo}><Button type="primary">添加展会</Button></Link>}
+                            description=' '
+
                         />
-                    }
-                    actions={this.state.operator?[
-                        <Icon type="setting" key="setting" />,
-                        <Icon type="edit" key="edit" />,
-                    ]:[<Button type="primary">查询展会</Button>]}
-                >
-                    <Meta
-                        // avatar={<Icon type="" />}
-                        title={this.state.metaTitle}
-                        description={this.state.metaDescription}
-                    />
+                    </Card>
+                    :
+                    <Card
+                        className = "normal-container"
+                        style={{ width: 300 }}
+                        cover={
+                            <img
+                                alt="example"
+                                src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
+                            />
+                        }
+                        actions={
+                            [
+                                <Icon type="setting" key="setting" />,
+                                <Icon type="edit" key="edit" />,
+                            ]}
+                    >
+                        <Meta
+                            // avatar={<Icon type="" />}
+                            title={this.props.expoInfo.expoTitle}
+                            description={this.props.expoInfo.expoDescription}
+                        />
                 </Card>
+            }
             </div>
         )
     }

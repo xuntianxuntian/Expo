@@ -11,9 +11,10 @@ const User = require('../../models/User/User.model')
 
 router.post('/', (req, res) => {
     console.log('进入login.route')
-    const {isValid,errors} = validateLoginData(req.body)
+    console.log(req.body)
+    const {isValid,errors} = validateLoginData(req.body.params)
     if(!isValid) return res.status(400).json(errors)
-    const { email, password } = req.body
+    const { email, password } = req.body.params
     User.find({ email })
         .then(users => {
             if (users.length === 0) {

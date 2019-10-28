@@ -8,7 +8,7 @@ const initialState = {
 export const registerReducer = (state = initialState,action) => {
 
     switch(action.type){
-        case REGISTER_USER:
+        case HANDLER_TOOGLE:
             return {...state,
                 handler:action.payload
             }

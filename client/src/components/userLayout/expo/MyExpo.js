@@ -27,7 +27,7 @@ class MyExpo extends Component {
             .catch(err =>console.log(err))
     }
     render() {
-
+        console.log(this.state.expo)
         return (
             <Fragment>
                 <ExpoCard status="EXPO" expoInfo={this.state.expo} />

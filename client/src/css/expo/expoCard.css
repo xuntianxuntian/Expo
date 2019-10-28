@@ -1,0 +1,82 @@
+.ant-card {
+    margin: 8px 15px;
+    float: left;
+    height: 300px;
+}
+
+.normal-container  .ant-card-cover {
+    height: 100px;
+    overflow: hidden;
+}
+
+.normal-container  .ant-card-cover img {
+    height: auto;
+}
+
+.normal-container  .ant-card-body {
+    padding: 10px;
+
+}
+
+.normal-container .ant-card-meta-title {
+    height: 50px;
+    white-space: unset;
+    text-overflow: unset;
+    overflow: unset;
+    word-break: normal;
+    text-align: center;
+}
+
+.normal-container .ant-card-meta-description {
+    height: 70px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box ;
+    -webkit-line-clamp:3 ;
+    -webkit-box-orient:vertical;
+
+}
+
+
+/* ---------------------------------------------add-container */
+
+
+.add-container  .ant-card-cover {
+    height: 180px;
+    overflow: hidden;
+    font-size: 80px;
+}
+.add-container  .ant-card-cover i {
+    height: 100%;
+    position: relative;
+}
+.add-container  .ant-card-cover svg{
+    position: absolute;
+    right: 37%;
+    top:35%;
+}
+
+.add-container  .ant-card-cover img {
+    height: auto;
+}
+
+.add-container  .ant-card-body {
+    padding: 10px;
+
+}
+
+.add-container .ant-card-meta-title {
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+    font-size: 20px;
+    /* white-space: unset;
+    text-overflow: unset;
+    overflow: unset;
+    word-break: normal;
+    text-align: center; */
+}
+
+.add-container .ant-card-actions{
+    height: 30px;
+}

@@ -26,22 +26,13 @@ class NormalLoginForm extends React.Component {
     
     const { email, password } = this.props.form.getFieldsValue()
     await this.props.loginUser({ email, password }, this.props.history)
-    // await this.setState({
-    //   ...this.state,
-    //   isFetching: this.props.login.isAuthorized
-    // })
+    
   }
 
   
-  // async componentWillReceiveProps(nextProp) {
-  //   const error = nextProp.login.error
-  //   await this.setState({
-  //     error
-  //   })
-  // }
-
+  
   render() {
-
+    console.log("loading:"+`${this.props.loading}`)
     const spinIcon = <Icon type={this.props.registerDone ? "check" : "loading"} style={{ fontSize: 24, color: "white" }} />
     const { getFieldDecorator } = this.props.form;
 
@@ -91,7 +82,7 @@ class NormalLoginForm extends React.Component {
 
           </Form.Item>
           <Button type="primary" htmlType="submit" className="login-form-button">
-            登录{this.state.isFetching?<Spin indicator={spinIcon} size="small" />:''}
+            登录{this.props.loading?<Spin indicator={spinIcon} size="small" />:''}
           </Button>
         </Form>
       </div>
@@ -103,12 +94,14 @@ class NormalLoginForm extends React.Component {
 
 const mapStateToProps = state => ({
   login: state.login,
+  loading:state.loading.isloading
 })
 
 const Login = Form.create({ name: 'normal_login' })(NormalLoginForm);
 
 
 Login.propTypes = {
+  loading:PropTypes.bool.isRequired,
   login: PropTypes.object.isRequired,
   loginUser: PropTypes.func.isRequired
 }
