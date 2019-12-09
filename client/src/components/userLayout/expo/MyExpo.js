@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import ExpoCard from './ExpoCard';
 import axios from 'axios'
+import store from '../../../store'
 
 
 
@@ -9,28 +10,34 @@ class MyExpo extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            expo: {}
+            expos: [{}]
         }
+
     }
 
     componentDidMount() {
+        localStorage.setItem('sideLocation', window.location.pathname.split('/')[1])
+        store.dispatch({
+            type: "TOOGLE_SIDERBAR",
+            payload: "myExpo"
+        })
+
         axios.get('/api/myExpo.json')
             .then(res => {
-                console.log(res.data[0])
                 if (res.data.length) {
                     this.setState({
                         ...this.state,
-                        expo : res.data[0]
+                        expos: res.data
                     })
                 }
             })
-            .catch(err =>console.log(err))
+            .catch(err => console.log(err))
     }
     render() {
-        console.log(this.state.expo)
         return (
             <Fragment>
-                <ExpoCard status="EXPO" expoInfo={this.state.expo} />
+                {this.state.expos.map((expo, index) => <ExpoCard status="EXPO" expoInfo={expo} key={index} />
+                )}
                 <ExpoCard status="DEFAULT" />
             </Fragment>
         )

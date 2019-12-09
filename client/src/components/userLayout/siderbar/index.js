@@ -12,13 +12,13 @@ class SiderBar extends React.Component {
 
     constructor(props) {
         super(props)
-
+        
     }
 
-    menuOnClick = (e) => {
-        toogleHandler(e.key)
-        console.log(this.props.location)
-    }
+    
+    // menuOnClick = (e) => {
+    //     this.props.toogleHandler(e.key)
+    // }
     // currentOpenKey = ()=>{
     //     console.log(this.props.location)
     //     return this.props.location
@@ -37,9 +37,9 @@ class SiderBar extends React.Component {
                         // defaultSelectedKeys={['myExpo']}
                         defaultOpenKeys={['expo']}
                         style={{ height: '100%', borderRight: 0 }}
-                        openkeys={this.props.location}
-                        selectedKeys={[this.props.location]}
-                        onClick={this.menuOnClick}
+                        openkeys={this.props.location?this.props.location:null}
+                        selectedKeys={[this.props.location]?[this.props.location]:null}
+                        // onClick={this.menuOnClick}
                     >
                         <SubMenu
                             key="expo"
@@ -63,14 +63,14 @@ class SiderBar extends React.Component {
                                 <span>
                                     <Icon type="laptop" />
                                     资质手续
-                        </span>
+                                </span>
                             }
 
                         >
-                            <Menu.Item key="qualification">我的资质</Menu.Item>
-                            <Menu.Item key="booth">我的展位</Menu.Item>
-                            <Menu.Item key="submssion">我的申报</Menu.Item>
-                            <Menu.Item key="info">其他信息</Menu.Item>
+                            <Menu.Item key="qualification"><Link to="/qualification">公司资质</Link></Menu.Item>
+                            <Menu.Item key="booth"><Link to="/booth">我的展位</Link></Menu.Item>
+                            <Menu.Item key="submission"><Link to="/submission">手续申报</Link></Menu.Item>
+                            <Menu.Item key="info"><Link to="/info">其他信息</Link></Menu.Item>
                         </SubMenu>
                         <SubMenu
                             key="rentList"

@@ -32,14 +32,16 @@ require('./config/passport')(passport)
 const userRouter =require('./routes/api/user/user.route')
 const loginRouter = require('./routes/api/login.route')
 const registerRouter = require('./routes/api/register.route')
+const uploadRouter = require('./routes/api/uploads.route')
 
 
-console.log('1111111')
 //  Use Routes
 app.use('/login',loginRouter)
 app.use('/register',registerRouter)
 app.use('/user',userRouter)
+app.use('/uploads',uploadRouter)
 
+const path =` ${__dirname}/client`
 
-app.listen(port,()=>console.log(`Server is running on port ${port}`))
+app.listen(port,()=>console.log(`Server is running on port ${port},dir:${path}`))
 

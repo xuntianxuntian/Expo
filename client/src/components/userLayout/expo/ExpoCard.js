@@ -24,9 +24,10 @@ class ExpoCard extends Component {
     }
 
     onAddExpo = (e) =>{
+        localStorage.setItem('sideLocation','getExpo')
         store.dispatch({
             type:TOOGLE_SIDERBAR,
-            patload:"getExpo"
+            payload:'getExpo'
         })
     }
 
