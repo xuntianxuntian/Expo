@@ -11,6 +11,12 @@ import setAuthorization from './utils/setAuthorization'
 import { AuthRoute } from './routes/AuthRoute'
 import AuthComponent from './components/auth/index.authComponent';
 
+import axiosInterceptors from './utils/axiosInterceptors'
+
+
+//axios 错误拦截器初始化  未认证重定向到'/login'
+// axiosInterceptors()
+
 if (localStorage.token) {
   const token = localStorage.token
   const decode = jwt_decode(token)
@@ -23,9 +29,9 @@ if (localStorage.token) {
 }
 
 class App extends React.Component {
-  constructor(props) {
-    super(props)
-  }
+  // constructor(props) {
+  //   super(props)
+  // }
 
   render() {
     return (

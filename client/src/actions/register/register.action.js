@@ -2,7 +2,7 @@ import { REGISTER_USER,REGISTER_ERROR } from '../types'
 import axios from 'axios'
 
 const registerUser = (userData,history) => async(dispatch) => {
-    await axios.post('/register', userData)
+    await axios.post('/api/register', userData)
         .then(res => {
             if(res.data){
                 dispatch({

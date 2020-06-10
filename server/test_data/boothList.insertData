@@ -1,0 +1,47 @@
+
+
+db.booths.insert({
+    boothId:"A2A08",
+    boothSize:"54",
+    boothName:"中国石油天然气集团公司",
+    expoId:ObjectId("5e08bb1c71ec3d107b1e0b76"),
+})
+
+db.booths.insert({
+    boothId:"B1A24",
+    boothSize:"108",
+    boothName:"中国建设银行股份有限公司",
+    expoId:ObjectId("5e08bb1c71ec3d107b1e0b76"),
+    authorFiles:[{enTrust:"asdasdasd"}]
+})
+db.booths.insert({
+    boothId:"A5B101",
+    boothSize:"96",
+    boothName:"国家开发银行股份有限公司",
+    expoId:ObjectId("5e08bb2171ec3d107b1e0b78"),
+    authorFiles:[{enTrust:"asssss"}]
+})
+
+db.booths.insert({
+    boothId:"TA05",
+    boothSize:"36",
+    boothName:"国家电网有限公司",
+    expoId:ObjectId("5e08bb2171ec3d107b1e0b78"),
+    authorFiles:[{enTrust:"asdasaaaaad"}]
+})
+
+db.booths.insert({
+    boothId:"B5B16",
+    boothSize:"120",
+    boothName:"武汉多人行展览服务有限公司",
+    expoId:ObjectId("5e08bb1c71ec3d107b1e0b77"),
+    authorFiles:[{enTrust:"as123123d"}]
+})
+
+db.booths.insert({
+    boothId:"A1C25",
+    boothSize:"66",
+    boothName:"微软（中国）股份有限公司",
+    expoId:ObjectId("5e08bb1c71ec3d107b1e0b77"),
+    authorFiles:[{enTrust:"asdasd22222d"}]
+})

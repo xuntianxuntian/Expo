@@ -1,11 +1,17 @@
 import React, { Component } from 'react'
-import { Card, Icon, Button } from 'antd'
+import { Card, Icon, Button, Typography, Table, Divider, Tag } from 'antd'
 import { Link } from 'react-router-dom'
 import store from '../../../store'
-import {TOOGLE_SIDERBAR} from '../../../actions/types'
-
-
+import { TOOGLE_SIDERBAR } from '../../../actions/types'
 import isEmpty from '../../../utils/isEmpty'
+import axios from 'axios'
+
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import currentExpo from '../../../actions/currentExpo.action'
+import { changeToBoothList } from '../../../actions/changeBoothList.action'
+
+
 import '../../../css/expo/expoCard.css'
 
 
@@ -15,76 +21,187 @@ class ExpoCard extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            imgSrc: '',//图片源
-            imgAlt: '', //图片的alt属性
-            operator: false,//下方action操作按钮的切换控制
-            metaTitle: '添加展会',
-            metaDescription: ''
+            intoExpo: 'primary',
+            pageNum: 1
         }
     }
 
-    onAddExpo = (e) =>{
-        localStorage.setItem('sideLocation','getExpo')
+    onAddExpo = (e) => {
+        localStorage.setItem('sideLocation', 'getExpo')
         store.dispatch({
-            type:TOOGLE_SIDERBAR,
-            payload:'getExpo'
+            type: TOOGLE_SIDERBAR,
+            payload: 'getExpo'
         })
     }
 
+    //通过展会的名称查询返回响应的网址
+    getExpoUrl = (expoName) => {
+        for (let i = 0; i < this.props.expos.length; i++) {
+            if (expoName == this.props.expos[i].expoName) {
+                return this.props.expos[i].expoUrl
+            }
+        }
+        return ''
+    }
+    componentDidMount() {
+        console.log(this.props)
+    }
+    componentWillUpdate() {
+        console.log(this.props)
+    }
+
+    //点击进入展会按钮的回调
+    onInExpoClick = (e, cid) => {
+        e.preventDefault()
+        this.props.currentExpo(cid)
+        let btn = document.getElementsByClassName("ant-btn-primary intoExpoClass")[0]
+        if (e.target == btn) {
+            return null
+        } else if (btn == undefined) {
+            e.target.classList.remove('ant-btn-default')
+            e.target.classList.add('ant-btn-primary')
+            e.target.innerHTML = '当前展会'
+            //切换展会时重新加载boothList
+            axios.get('/api/booth/listAll', { params: { cid } })
+            .then(
+                res => {
+                    console.log(res.data)
+                    if (res.data.length) {
+                        res.data.forEach((booth, index) => {
+                            booth['key'] = index
+                        })
+                        this.props.changeToBoothList(res.data)
+                    } else {
+                        this.props.changeToBoothList({})
+                    }
+                })
+            .catch(err => {
+                console.log(err)
+                this.props.changeToBoothList([])
+            })
+        } else {
+            btn.classList.remove("ant-btn-primary")
+            btn.classList.add("ant-btn-default")
+            btn.innerHTML = '点击切换'
+            if (e.target.classList.contains('ant-btn-primary')) {
+
+                return null
+            } else {
+                e.target.classList.remove('ant-btn-default')
+                e.target.classList.add('ant-btn-primary')
+                e.target.innerHTML = '当前展会'
+                //切换展会时重新加载boothList
+                axios.get('/api/booth/listAll', { params: { cid } })
+                    .then(
+                        res => {
+                            console.log(res.data)
+                            if (res.data.length) {
+                                res.data.forEach((booth, index) => {
+                                    booth['key'] = index
+                                })
+                                this.props.changeToBoothList(res.data)
+                            } else {
+                                this.props.changeToBoothList({})
+                            }
+                        })
+                    .catch(err => {
+                        console.log(err.response)
+                        this.props.changeToBoothList([])
+                    })
+            }
+        }
+
+
+    }
+
+
+
 
     render() {
-        const { Meta } = Card
+        // const { Meta } = Card
+        // const { Title, Text } = Typography
+
+        const pagination = {
+            current: this.state.pageNum,
+            onChange: page => {
+                this.setState({
+                    ...this.state,
+                    pageNum: page
+                })
+            },
+            pageSize: 5
+        }
+
+        const columns = [
+            {
+                title: '展会名称',
+                dataIndex: 'expoName',
+                key: 'expoName',
+                render: text => <a href={this.getExpoUrl(text)} target='blank'>{text}</a>,
+            },
+            {
+                title: '举办时间',
+                dataIndex: 'openTime',
+                key: 'openTime',
+            },
+            {
+                title: '结束时间',
+                dataIndex: 'closeTime',
+                key: 'closeTime',
+            },
+            {
+                title: '报馆截止日期',
+                key: 'commitTime',
+                dataIndex: 'commitTime',
+            },
+            {
+                title: 'Action',
+                key: 'action',
+                render: (text, record, index) => {
+                    if (isEmpty(localStorage.currentExpoCID) && index === 0) {
+                        return (<span>
+                            <Button type='primary' className='intoExpoClass' onClick={(e) => this.onInExpoClick(e, record.cid)}>当前展会</Button>
+                        </span>)
+                    } else if (localStorage.currentExpoCID === record.cid) {
+                        return (<span>
+                            <Button type='primary' className='intoExpoClass' onClick={(e) => this.onInExpoClick(e, record.cid)}>当前展会</Button>
+                        </span>)
+                    } else {
+                        return (<span>
+                            <Button type='default' className='intoExpoClass' onClick={(e) => this.onInExpoClick(e, record.cid)}>点击切换</Button>
+                        </span>)
+                    }
+
+                }
+            },
+        ]
+
+        this.props.expos.forEach((expo, key) => {
+            expo.key = key
+        })
+        const data = this.props.expos
+        console.log(this.props.tableLoading)
 
         return (
-            <div>{
-                isEmpty(this.props.expoInfo) ?
-                    <Card
-                        className = "add-container"
-                        style={{ width: 300 }}
-                        cover={
-                            <Icon type="plus-circle" />
-                        }
-                        actions={
-                            [<Button type="primary">查询展会</Button>]
-                        }
-                    >
-
-                        <Meta
-                            // avatar={<Icon type="" />}
-                            title={<Link to = "/getExpo" onClick={this.onAddExpo}><Button type="primary">添加展会</Button></Link>}
-                            description=' '
-
-                        />
-                    </Card>
-                    :
-                    <Card
-                        className = "normal-container"
-                        style={{ width: 300 }}
-                        cover={
-                            <img
-                                alt="example"
-                                src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-                            />
-                        }
-                        actions={
-                            [
-                                <Icon type="setting" key="setting" />,
-                                <Icon type="edit" key="edit" />,
-                            ]}
-                    >
-                        <Meta
-                            // avatar={<Icon type="" />}
-                            title={this.props.expoInfo.expoTitle}
-                            description={this.props.expoInfo.expoDescription}
-                        />
-                </Card>
-            }
+            <div>
+                <Table columns={columns} dataSource={data} pagination={pagination} loading={this.props.tableLoading} />
+                <Button type="primary" size='large' style={{ marginLeft: '45%' }}><Link to='/getExpo'>添加展会</Link></Button>
             </div>
         )
     }
 }
 
 
+const mapStateToProps = state => ({
+    currentExpoCID: state.switchOperateExpo,
+})
 
 
-export default ExpoCard
+
+ExpoCard.propTypes = {
+    currentExpoCID: PropTypes.object.isRequired,
+    currentExpo: PropTypes.func.isRequired,
+    changeToBoothList: PropTypes.func.isRequired
+}
+
+export default connect(mapStateToProps, { currentExpo, changeToBoothList })(ExpoCard)

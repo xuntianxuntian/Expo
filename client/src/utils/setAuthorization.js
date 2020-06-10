@@ -2,9 +2,9 @@ import axios from 'axios'
 
 const Authorization = (token) =>{
     if(token.tirm !== ''){
-        axios.defaults.headers.common['Ahtorization'] = token
+        axios.defaults.headers.common['Authorization'] = token
     }else{
-        delete  axios.defaults.headers.common['Ahtorization']
+        delete  axios.defaults.headers.common['Authorization']
     }
 
 }

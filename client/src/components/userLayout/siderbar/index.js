@@ -10,10 +10,10 @@ import isEmpty from '../../../utils/isEmpty';
 
 class SiderBar extends React.Component {
 
-    constructor(props) {
-        super(props)
+    // constructor(props) {
+    //     super(props)
         
-    }
+    // }
 
     
     // menuOnClick = (e) => {
@@ -69,7 +69,7 @@ class SiderBar extends React.Component {
                         >
                             <Menu.Item key="qualification"><Link to="/qualification">公司资质</Link></Menu.Item>
                             <Menu.Item key="booth"><Link to="/booth">我的展位</Link></Menu.Item>
-                            <Menu.Item key="submission"><Link to="/submission">手续申报</Link></Menu.Item>
+                            <Menu.Item key="boothDesign"><Link to="/boothDesign">手续申报</Link></Menu.Item>
                             <Menu.Item key="info"><Link to="/info">其他信息</Link></Menu.Item>
                         </SubMenu>
                         <SubMenu
@@ -81,8 +81,8 @@ class SiderBar extends React.Component {
                         </span>
                             }
                         >
-                            <Menu.Item key="rentItem">添加项目</Menu.Item>
-                            <Menu.Item key="account">费用结算</Menu.Item>
+                            <Menu.Item key="itemlist"><Link to="/itemlist">添加项目</Link></Menu.Item>
+                            <Menu.Item key="orderlist"><Link to="/orderlist">订单详情</Link></Menu.Item>
                         </SubMenu>
                     </Menu>
                 </Sider>)

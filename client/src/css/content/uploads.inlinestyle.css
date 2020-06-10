@@ -1,0 +1,17 @@
+.upload-list-inline-boothDesign .ant-upload-list-item {
+    float: left;
+    width: 200px;
+    margin-right: 8px;
+  }
+
+  .upload-list-inline-qualification .ant-upload-list-item {
+    float: left;
+    width: 200px;
+    margin-right: 8px;
+  }
+
+  .upload-list-inline-default .ant-upload-list-item {
+    float: left;
+    width: 200px;
+    margin-right: 8px;
+  }

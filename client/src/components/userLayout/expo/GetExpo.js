@@ -9,8 +9,8 @@ import tooglehandler from '../../../actions/toogleSiderBar.action'
 import ExpoList from './ExpoList';
 import axios from 'axios'
 import LoadingContentComponent from '../content/LoadingContent.component';
-import renderEmpty from 'antd/lib/config-provider/renderEmpty';
-import isEmpty from '../../../utils/isEmpty';
+// import renderEmpty from 'antd/lib/config-provider/renderEmpty';
+// import isEmpty from '../../../utils/isEmpty';
 
 const { Search } = Input
 
@@ -30,46 +30,49 @@ class GetExpo extends React.Component {
         localStorage.setItem('sideLocation', window.location.pathname.split('/')[1])
         this.props.tooglehandler('getExpo')
         this.props.isloading(true)
-        console.log('asda22222')
-        axios.get('/api/expo/expoList/ExpoList.json').then(res => {
+        axios.get('/api/expo/all').then(res => {
             this.props.isloading(false)
             this.setState({
                 dataSource: res.data
             })
+            localStorage.setItem('expoData',JSON.stringify(this.state.dataSource))
         }).catch(err => console.log(err))
+    }
+    //强制清除组件卸载时的异步请求和setState操作
+    componentWillUnmount(){
+        this.setState = (state, callback) => {
+            return state 
+        }
     }
 
     onSearchHandler = (value) => {
+        //用LocalStorage来本地存储数据  UNSAFE----------------------
+        // let searchReg = new RegExp(value)
+        // console.log(JSON.parse(localStorage.expoData))
+        // const filteredData = JSON.parse(localStorage.expoData).filter(
+        //     (expo) =>{
+        //         return searchReg.test(expo.expoName)
+        //     }
+        // )
+        // this.setState({
+        //     ...this.state,
+        //     dataSource:filteredData
+        // })----------------------------------------------------
         this.setState({
             ...this.state,
             onSearchLoading:true
         })
-        axios.get('/api/expo/expoList/ExpoList.json')
+        axios.get('/api/expo/query',{params:{expoName:value}}) 
         .then(res => {
             this.setState({
                 ...this.state,
                 onSearchLoading:false
             })
-            if (value === null || value === '') {
-                this.setState({
-                    dataSource: res.data
-                })
-                // console.log(defaultData)
-            } else {
-                let dataReg = new RegExp(value)
-                this.setState({
-                    dataSource: res.data.filter(
-                                    (item) => {
-                                        return dataReg.test(item.expoTitle)
-                                    }
-                                )
-                })
-
-            }
+            this.setState({
+                dataSource: res.data
+            })
         })
         .catch(err => console.log(err))
-        
-
     }
 
 

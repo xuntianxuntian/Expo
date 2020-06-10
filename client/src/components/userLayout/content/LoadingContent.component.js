@@ -5,9 +5,7 @@ import PropTypes from 'prop-types'
 
 class LoadingContent extends Component {
 
-    constructor(props){
-        super(props)
-    }
+    
 
 
     render() {
@@ -15,7 +13,7 @@ class LoadingContent extends Component {
         return (
             <div style = {{position:'absolute',right:'37%',top:'47%'}}>
                 <Icon type="loading" style={{ fontSize: 24 }} spin />
-                Loading...
+                正在加载...
             </div>
         )
     }

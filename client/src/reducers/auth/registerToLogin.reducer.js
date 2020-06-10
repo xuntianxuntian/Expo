@@ -1,5 +1,4 @@
 import {  REGISTER_TO_LOGIN } from '../../actions/types'
-import isEmpty from '../../utils/isEmpty'
 
 
 const initialState = {tabKey:'1'}

@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import store from '../../../../store'
-import bg from '../../../../bg_02.jpg'
 
 class Submission extends Component {
 
@@ -18,7 +17,7 @@ class Submission extends Component {
         return (
             <div>
                 手续申报
-                <img src = {"../../../../bg_02.jpg"} />
+                <img src = "../../../../bg_02.jpg" />
             </div>
         )
     }

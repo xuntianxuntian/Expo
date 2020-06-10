@@ -7,7 +7,7 @@ import { connect } from 'react-redux'
 import loginUser from '../../../actions/login/login.action'
 
 import '../../../css/auth/login.component.css'
-import isEmpty from '../../../utils/isEmpty';
+// import isEmpty from '../../../utils/isEmpty';
 
 class NormalLoginForm extends React.Component {
   constructor(props) {
@@ -32,7 +32,6 @@ class NormalLoginForm extends React.Component {
   
   
   render() {
-    console.log("loading:"+`${this.props.loading}`)
     const spinIcon = <Icon type={this.props.registerDone ? "check" : "loading"} style={{ fontSize: 24, color: "white" }} />
     const { getFieldDecorator } = this.props.form;
 
@@ -94,7 +93,7 @@ class NormalLoginForm extends React.Component {
 
 const mapStateToProps = state => ({
   login: state.login,
-  loading:state.loading.isloading
+  loading:state.loading.isloading,
 })
 
 const Login = Form.create({ name: 'normal_login' })(NormalLoginForm);

@@ -5,11 +5,23 @@ import { registerReducer } from './auth/register.reducer'
 import { registerToLogin } from '../reducers/auth/registerToLogin.reducer'
 import { toogleSiderBar } from './toogleSiderBar.reducer'
 import { isLoading } from './loading.reducer'
+import { switchOperateExpo } from './switchOperateExpo.reducer'
+import { companyToUpload } from './companyToUpload.reducer'
+import { boothList } from './boothList.reducer'
+import { infoTempList } from './infoTempList.reducer'
+import { boothUploadInfo } from './DesignUploads/boothUploadInfo.reducer'
+import { selectedTab } from './DesignUploads/switchTab.reducer'
 
 export default combineReducers({
     login: loginReducer,
     register: registerReducer,
     toLogin: registerToLogin,
     toogleSiderBar,
-    loading:isLoading
+    loading: isLoading,
+    switchOperateExpo,
+    companyToUpload,
+    boothList,
+    infoTempList,
+    boothUploadInfo,
+    selectedTab
 })

@@ -2,7 +2,6 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
-  "homepage": ".",
   "dependencies": {
     "antd": "^3.23.6",
     "axios": "^0.19.0",
@@ -28,7 +27,7 @@
     "build": "react-app-rewired build",
     "test": "react-app-rewired test"
   },
-  "proxy": "http://localhost:5000",
+  "proxy": "http://localhost:8001",
   "eslintConfig": {
     "extends": "react-app"
   },
