@@ -10,6 +10,7 @@ import setAuthorization from './utils/setAuthorization'
 
 import { AuthRoute } from './routes/AuthRoute'
 import AuthComponent from './components/auth/index.authComponent';
+import AdminLayout from './components/adminLayout'
 
 import axiosInterceptors from './utils/axiosInterceptors'
 
@@ -38,10 +39,13 @@ class App extends React.Component {
       <Provider store={store}>
         <Router>
           <Switch>
+            <Route path='/admin'>
+              <AdminLayout />
+            </Route>
             <Route path='/login'>
               <AuthComponent />
             </Route>
-            <AuthRoute path='/'  >
+            <AuthRoute  path='/'  >
               <UserLayout />
             </AuthRoute>
           </Switch>

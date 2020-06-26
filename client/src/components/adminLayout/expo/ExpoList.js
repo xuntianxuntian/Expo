@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Card, Icon, Button, Typography, Table, Divider, Tag } from 'antd'
+import { Button,  Table,} from 'antd'
 import { Link } from 'react-router-dom'
 import store from '../../../store'
 import { TOOGLE_SIDERBAR } from '../../../actions/types'
@@ -16,7 +16,7 @@ import '../../../css/expo/expoCard.css'
 
 
 
-class ExpoCard extends Component {
+class ExpoList extends Component {
 
     constructor(props) {
         super(props)
@@ -44,10 +44,11 @@ class ExpoCard extends Component {
         return ''
     }
     componentDidMount() {
-        console.log(this.props)
+
+
     }
     componentWillUpdate() {
-        console.log(this.props)
+        
     }
 
     //点击进入展会按钮的回调
@@ -63,22 +64,21 @@ class ExpoCard extends Component {
             e.target.innerHTML = '当前展会'
             //切换展会时重新加载boothList
             axios.get('/api/booth/listAll', { params: { cid } })
-            .then(
-                res => {
-                    console.log(res.data)
-                    if (res.data.length) {
-                        res.data.forEach((booth, index) => {
-                            booth['key'] = index
-                        })
-                        this.props.changeToBoothList(res.data)
-                    } else {
-                        this.props.changeToBoothList({})
-                    }
+                .then(
+                    res => {
+                        if (res.data.length) {
+                            res.data.forEach((booth, index) => {
+                                booth['key'] = index
+                            })
+                            this.props.changeToBoothList(res.data)
+                        } else {
+                            this.props.changeToBoothList({})
+                        }
+                    })
+                .catch(err => {
+                    console.log(err)
+                    this.props.changeToBoothList([])
                 })
-            .catch(err => {
-                console.log(err)
-                this.props.changeToBoothList([])
-            })
         } else {
             btn.classList.remove("ant-btn-primary")
             btn.classList.add("ant-btn-default")
@@ -175,17 +175,20 @@ class ExpoCard extends Component {
                 }
             },
         ]
+        let data = []
+        if (this.props.expos.length) {
 
-        this.props.expos.forEach((expo, key) => {
-            expo.key = key
-        })
-        const data = this.props.expos
-        console.log(this.props.tableLoading)
+            this.props.expos.forEach((expo, key) => {
+                expo.key = key
+            })
+            data = this.props.expos
+        }
+
 
         return (
             <div>
                 <Table columns={columns} dataSource={data} pagination={pagination} loading={this.props.tableLoading} />
-                <Button type="primary" size='large' style={{ marginLeft: '45%' }}><Link to='/getExpo'>添加展会</Link></Button>
+                <Button type="primary" size='large' style={{ marginLeft: '45%' }}><Link to='/admin/addExpo'>添加展会</Link></Button>
             </div>
         )
     }
@@ -198,10 +201,9 @@ const mapStateToProps = state => ({
 
 
 
-ExpoCard.propTypes = {
+ExpoList.propTypes = {
     currentExpoCID: PropTypes.object.isRequired,
     currentExpo: PropTypes.func.isRequired,
-    changeToBoothList: PropTypes.func.isRequired
 }
 
-export default connect(mapStateToProps, { currentExpo, changeToBoothList })(ExpoCard)
+export default connect(mapStateToProps, { currentExpo })(ExpoList)

@@ -13,6 +13,10 @@ const loginUser = (userData, history) => async (dispatch) => {
             })
             const { token } = res.data
             const decode = jwt_decode(token)
+            //检查用户权限  如果是管理员 则切换到管理员页面
+            if(decode.handler === 'ADMIN'){
+                return history.push('/admin')
+            }
             if (token) {
                 localStorage.setItem('token', token)
                 localStorage.setItem('expoCID', JSON.stringify(decode.expoCID))
