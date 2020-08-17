@@ -12,7 +12,7 @@ import LoadingContentComponent from '../content/LoadingContent.component';
 // import renderEmpty from 'antd/lib/config-provider/renderEmpty';
 // import isEmpty from '../../../utils/isEmpty';
 
-const { Search } = Input
+
 
 
 
@@ -22,7 +22,7 @@ class GetExpo extends React.Component {
         super(props)
         this.state = {
             dataSource: [{}],
-            onSearchLoading:false
+            onSearchLoading: false
         }
     }
 
@@ -30,18 +30,20 @@ class GetExpo extends React.Component {
         localStorage.setItem('sideLocation', window.location.pathname.split('/')[1])
         this.props.tooglehandler('getExpo')
         this.props.isloading(true)
-        axios.get('/api/expo/all').then(res => {
+        axios.get('/api/user/listExpo').then(res => {
+            const { expo } = res.data
+            console.log(expo)
             this.props.isloading(false)
             this.setState({
-                dataSource: res.data
+                dataSource: expo
             })
-            localStorage.setItem('expoData',JSON.stringify(this.state.dataSource))
+            localStorage.setItem('expoData', JSON.stringify(this.state.dataSource))
         }).catch(err => console.log(err))
     }
     //强制清除组件卸载时的异步请求和setState操作
-    componentWillUnmount(){
+    componentWillUnmount() {
         this.setState = (state, callback) => {
-            return state 
+            return state
         }
     }
 
@@ -60,23 +62,25 @@ class GetExpo extends React.Component {
         // })----------------------------------------------------
         this.setState({
             ...this.state,
-            onSearchLoading:true
+            onSearchLoading: true
         })
-        axios.get('/api/expo/query',{params:{expoName:value}}) 
-        .then(res => {
-            this.setState({
-                ...this.state,
-                onSearchLoading:false
+        axios.post('/api/user/expo/queryByName', { queryString: value })
+            .then(res => {
+                this.setState({
+                    ...this.state,
+                    onSearchLoading: false
+                })
+                this.setState({
+                    ...this.state,
+                    dataSource: res.data.expoList
+                })
             })
-            this.setState({
-                dataSource: res.data
-            })
-        })
-        .catch(err => console.log(err))
+            .catch(err => console.log(err))
     }
 
 
     render() {
+        const { Search } = Input
         return (this.props.loading ? <LoadingContentComponent /> :
             <div >
                 <h3 style={{ textAlign: "center", marginTop: "80px" }}>请选择参加的展会</h3>
@@ -89,10 +93,10 @@ class GetExpo extends React.Component {
                     style={{ width: "60%", marginLeft: '20%', marginBottom: "150px" }}
                 />
                 {
-                    this.state.onSearchLoading?<LoadingContentComponent />:
-                    <ExpoList dataSource={this.state.dataSource} ></ExpoList>
+                    this.state.onSearchLoading ? <LoadingContentComponent /> :
+                        <ExpoList dataSource={this.state.dataSource} ></ExpoList>
                 }
-                
+
             </div>
         )
     }
@@ -110,4 +114,4 @@ GetExpo.propTypes = {
     tooglehandler: PropTypes.func.isRequired,
 }
 
-export default connect(mapStateToProps, { isloading,tooglehandler })(GetExpo)
+export default connect(mapStateToProps, { isloading, tooglehandler })(GetExpo)

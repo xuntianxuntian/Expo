@@ -1,11 +1,10 @@
 import React, { Component } from 'react'
-import { Table, Divider, Tag, Upload, message, Button, Icon, Typography, Spin, Empty } from 'antd'
+import { Table, Tooltip, Tag, Upload, message, Button, Icon, Typography, Spin, Empty } from 'antd'
 import axios from 'axios'
 import { Link } from 'react-router-dom'
 import store from '../../../../store'
-import isEmpty from '../../../../utils/isEmpty'
+import moment from 'moment'
 import SearchBooth from './SearchBooth.component'
-import CustomUploads from '../../../customUploads.component'
 
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
@@ -28,40 +27,65 @@ class Booth extends Component {
             type: "TOOGLE_SIDERBAR",
             payload: "booth"
         })
-        //查询对应用户  当前展会的展位列表  
-        axios.get('/api/booth/listAll', { params: { cid: localStorage.currentExpoCID } })
-            .then(
-                res => {
-                    console.log(res.data)
-                    if (res.data.length) {
-                        res.data.forEach((booth, index) => {
-                            booth['key'] = index
-                        })
-                        this.props.changeToBoothList(res.data)
-                        this.setState({
-                            ...this.state,
-                            isLoading: false,
-                        })
-                    } else {
-                        this.setState({
-                            ...this.state,
-                            isLoading: false,
-                        })
-                    }
+        let eid = localStorage.getItem('current_eid')
+        if (eid) {
+            //查询对应用户  当前展会的展位列表  
+            axios.get(`/api/user/booth/list/${eid}`)
+                .then(
+                    res => {
+                        if (res.data.booth && res.data.booth.length) {
+                            let boothList = []
+                            boothList = res.data.booth.map((booth, index) => {
+                                let b = { ...booth }
+                                delete b.bName
+                                b.bName = booth.bName.fullName
+                                return { ...b, key: index }
+                            })
+                            this.props.changeToBoothList(boothList)
+                            this.setState({
+                                ...this.state,
+                                isLoading: false,
+                            })
+                        } else {
+                            this.props.changeToBoothList([])
+                            this.setState({
+                                ...this.state,
+                                isLoading: false,
+                            })
+                        }
+                    })
+                .catch(err => {
+                    console.log(err)
+                    this.setState({
+                        ...this.state,
+                        isLoading: false,
+                    })
                 })
-            .catch(err => {
-                console.log(err)
-                this.setState({
-                    ...this.state,
-                    isLoading: false,
-                })
-            })
+        }
     }
 
 
 
 
     render() {
+
+        let dataSource = []
+        console.log(this.props.boothList)
+        if (this.props.boothList && this.props.boothList.length) {
+            dataSource = this.props.boothList.map((b, i) => {
+                let { bName, bSize, bOwner, auth } = b
+                let wtPic = b.file ? b.file.wtPic : ''
+                let { company } = auth
+                return {
+                    bSize, bOwner, bName,
+                    authCompanyTime: company.authTime ? moment(company.authTime).format('YYYY-MM-DD HH:MM') : '-',
+                    authCompanyStatus: company.status,
+                    authCompanyErr: company.err ? company.err:' ',
+                    wtPic, key: i
+                }
+            })
+        }
+        console.log(dataSource)
 
         const { Title, Paragraph, Text } = Typography
         const props = {
@@ -86,76 +110,77 @@ class Booth extends Component {
         const columns = [
             {
                 title: '展位号',
-                dataIndex: 'boothId',
-                key: 'boothId',
+                dataIndex: 'bName',
+                key: 'bName',
                 align: 'center',
                 render: text => <Text>{text}</Text>,
             },
             {
                 title: '展位名称',
-                key: 'boothName',
-                dataIndex: 'boothName',
+                key: 'bOwner',
+                dataIndex: 'bOwner',
                 align: 'center',
             },
             {
                 title: '展位面积',
-                dataIndex: 'boothSize',
-                key: 'boothSize',
+                dataIndex: 'bSize',
+                key: 'bSize',
                 align: 'center',
-            }, {
-                title: '委托证明',
-                dataIndex: 'wtPic',
-                key: 'wtPic',
-                align: 'center',
-                render: text => {
-                    if (isEmpty(text)) {
-                        return <CustomUploads
-                            // style={{ display: 'inline-block' }}
-                            // startUploading={this.state.startUploading}
-                            uploadUrl='/api/uploads/booth'
-                            fileName='wtPic'
-                            previewStyle='text'
-                            previewClassName='upload-list-inline-boothList'
-                            isMultiple={true}
-                        />
-                        // return (<Upload {...props}>
-                        //     <Button>
-                        //         <Icon type="upload" /> 上传文件
-                        //             </Button>
-                        // </Upload>
-                        // )
-                    }
-
-                    return <span>资料已提交</span>
-                }
+                render: text => <Text>{text} ㎡</Text>,
             },
             {
                 title: '认证状态',
-                key: 'isEnTrust',
-                dataIndex: 'isEnTrust',
+                key: 'authCompanyStatus',
+                dataIndex: 'authCompanyStatus',
                 align: 'center',
-                render: isEntrusted => {
-                    if (isEntrusted) {
-                        return <Tag color='green'>已认证</Tag>
-
-                    } else {
-                        return <Tag color='blue'>未认证</Tag>
+                render: (authCompanyStatus, record) => {
+                    switch (authCompanyStatus) {
+                        case 'uncommited':
+                            return <Tag color='red'>未认证</Tag>
+                        case 'commited':
+                            return <Tag color='blue'>认证中</Tag>
+                        case 'failed':
+                            return <span>
+                                <Tag color='grey'>
+                                    认证失败
+                                </Tag>
+                                <Tooltip title={record.authCompanyErr ? record.authCompanyErr : ''}>
+                                    <span>查看详情</span>
+                                </Tooltip></span>
+                        case 'success':
+                            return <Tag color='green'>认证成功</Tag>
+                        default:
+                            return ''
                     }
 
                 },
             },
             {
-                title: '操作',
-                key: 'booth_operation',
-                dataIndex: 'booth_operation',
+                title: '认证时间',
+                key: 'authCompanyTime',
+                dataIndex: 'authCompanyTime',
                 align: 'center',
                 render: (text, record) => (
-                    <span>
-                        <Button type='primary'>提交</Button>
-                        <Divider type="vertical" />
-                        <Button type='danger' >删除</Button>
-                    </span>
+                    <Text>{text}</Text>
                 ),
+            },
+            {
+                title: '上传委托书',
+                key: 'wtPic',
+                dataIndex: 'wtPic',
+                align: 'center',
+                render: (wtPic, record) => {
+                    if (wtPic) {
+                        return <Text>已上传</Text>
+                    } else {
+                        return <Upload {...props}>
+                            <Button>
+                                <Icon type="upload" />
+                            </Button>
+                        </Upload>
+                    }
+
+                },
             },
         ]
 
@@ -173,7 +198,7 @@ class Booth extends Component {
                 </div>
                 <Table
                     columns={columns}
-                    dataSource={this.props.boothList}
+                    dataSource={dataSource}
                     loading={this.state.isLoading}
                     locale={{ emptyText: '还未添加展会!' }}
                     style={{

@@ -47,9 +47,7 @@ class ExpoList extends Component {
 
 
     }
-    componentWillUpdate() {
-        
-    }
+    
 
     //点击进入展会按钮的回调
     onInExpoClick = (e, cid) => {
@@ -63,7 +61,7 @@ class ExpoList extends Component {
             e.target.classList.add('ant-btn-primary')
             e.target.innerHTML = '当前展会'
             //切换展会时重新加载boothList
-            axios.get('/api/booth/listAll', { params: { cid } })
+            axios.get('/api/admin/booth/list.json', { params: { cid } })
                 .then(
                     res => {
                         if (res.data.length) {
@@ -94,7 +92,6 @@ class ExpoList extends Component {
                 axios.get('/api/booth/listAll', { params: { cid } })
                     .then(
                         res => {
-                            console.log(res.data)
                             if (res.data.length) {
                                 res.data.forEach((booth, index) => {
                                     booth['key'] = index
@@ -204,6 +201,7 @@ const mapStateToProps = state => ({
 ExpoList.propTypes = {
     currentExpoCID: PropTypes.object.isRequired,
     currentExpo: PropTypes.func.isRequired,
+    changeToBoothList: PropTypes.func.isRequired
 }
 
-export default connect(mapStateToProps, { currentExpo })(ExpoList)
+export default connect(mapStateToProps, { currentExpo ,changeToBoothList})(ExpoList)

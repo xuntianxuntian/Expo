@@ -15,8 +15,8 @@ class MyExpo extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            expos: [],
-            tableLoading:true
+            joinedExpoList: [],
+            tableLoading: true
         }
 
     }
@@ -28,23 +28,23 @@ class MyExpo extends Component {
             payload: "myExpo"
         })
 
-        axios.get('/api/user/myExpo')
+        axios.get('/api/user/expo/joinedList')
             .then(res => {
-                if (res.data.error) {
-                    return null
-                } else {
+                if (res.status == 200) {
+                    const joinedExpoList = res.data.expoList
                     this.setState({
                         ...this.state,
-                        expos: res.data.data
+                        joinedExpoList
                     })
-                        this.setState({
-                            ...this.state,
-                            tableLoading:false
-                        })
-                    // this.state.expos.foreach(expo =>{
-                    //     localStorage.expoCID.push(expo.cid)
-                    // })
+                    this.setState({
+                        ...this.state,
+                        tableLoading: false
+                    })
                 }
+                // this.state.expos.foreach(expo =>{
+                //     localStorage.expoCID.push(expo.cid)
+                // })
+
             })
             .catch(err => console.log(err))
     }
@@ -60,7 +60,7 @@ class MyExpo extends Component {
         const { Paragraph, Text, Title } = Typography
 
         return (
-            JSON.parse(localStorage.expoCID).length > 0 ?
+            this.state.joinedExpoList.length > 0 ?
                 (<Fragment>
                     <Typography style={{ paddingTop: '20px', paddingLeft: '15px' }}>
                         <Title level={4} >| 我的展会</Title>
@@ -69,7 +69,7 @@ class MyExpo extends Component {
                         </Paragraph>
                     </Typography>
                     <Divider />
-                    <ExpoCard expos={this.state.expos}  tableLoading={this.state.tableLoading}/>
+                    <ExpoCard expos={this.state.joinedExpoList} tableLoading={this.state.tableLoading} />
                 </Fragment>) : <div style={{ height: '100%' }}>
                     <Typography style={{ paddingTop: '20px', paddingLeft: '15px' }}>
                         <Title level={4} >| 我的展会</Title>

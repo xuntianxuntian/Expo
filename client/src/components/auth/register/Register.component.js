@@ -1,5 +1,5 @@
 import React from 'react'
-import { Form, Input, Tooltip, Icon, Select, Row, Col, Checkbox, Button, Spin,Result } from 'antd';
+import { Form, Input, Tooltip, Icon, Select, Row, Col, Checkbox, Button, Spin, Result } from 'antd';
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import registerUser from '../../../actions/register/register.action'
@@ -32,7 +32,7 @@ class RegistrationForm extends React.Component {
         })
     }
 
-    changeTab = (e)=>{
+    changeTab = (e) => {
         this.props.registerToLogin('1')
     }
 
@@ -87,31 +87,23 @@ class RegistrationForm extends React.Component {
                 },
             },
         };
-        const prefixSelector = getFieldDecorator('prefix', {
-            initialValue: '86',
-        })(
-            <Select style={{ width: 70 }}>
-                <Option value="86">+86</Option>
-                <Option value="87">+87</Option>
-            </Select>,
-        );
 
 
 
         return (this.state.registerDone ? (
             <Result
                 status="success"
-                title = {'注册成功！欢迎 '+this.props.register.user.email}
+                title={'注册成功！欢迎 ' + this.props.register.user.email}
                 subTitle=""
                 extra={[
                     <Button type="primary" key="console" onClick={this.changeTab}>
                         马上登录
                     </Button>
-                    
+
                 ]}
             />
         ) : (<Form {...formItemLayout} onSubmit={this.handleSubmit}>
-            <Form.Item label="邮箱"
+            <Form.Item label="邮箱/手机号"
                 extra={this.props.register.error.email ? this.props.register.error.email : ''}
                 validateStatus={this.props.register.error.email ? 'error' : ''}
             >
@@ -160,30 +152,6 @@ class RegistrationForm extends React.Component {
                     ],
                 })(<Input.Password onBlur={this.handleConfirmBlur} />)}
             </Form.Item>
-            <Form.Item
-                label={
-                    <span>
-                        公司名称&nbsp;
-                                <Tooltip title="场馆服务商/搭建商/参展商 ：公司名称">
-                            <Icon type="question-circle-o" />
-                        </Tooltip>
-                    </span>
-                }
-                extra={this.props.register.error.company ? this.props.register.error.company : ''}
-                validateStatus={this.props.register.error.company ? 'error' : ''}
-            >
-                {getFieldDecorator('company', {
-                    rules: [{ required: true, message: '请输入公司全称', whitespace: true }],
-                })(<Input />)}
-            </Form.Item>
-            <Form.Item label="手机"
-                extra={this.props.register.error.tel ? this.props.register.error.tel : ''}
-                validateStatus={this.props.register.error.tel ? 'error' : ''}
-            >
-                {getFieldDecorator('tel', {
-                    rules: [{ required: true, message: 'Please input your phone number!' }],
-                })(<Input addonBefore={prefixSelector} style={{ width: '100%' }} />)}
-            </Form.Item>
             <Form.Item label="验证码"
                 extra={this.props.register.error.captcha ? this.props.register.error.captcha : ''}
                 validateStatus={this.props.register.error.captcha ? 'error' : ''}
@@ -209,7 +177,7 @@ class RegistrationForm extends React.Component {
                 )}
             </Form.Item>
             <Form.Item {...tailFormItemLayout}>
-                <Button type="primary" htmlType="submit"     className="register-form-button">
+                <Button type="primary" htmlType="submit" className="register-form-button">
                     注册
                         </Button>
                 {this.state.isFetching ? <Spin indicator={spinIcon} size="large" /> : ''}
@@ -224,7 +192,7 @@ class RegistrationForm extends React.Component {
 
 const mapStateToProps = state => ({
     register: state.register,
-    toLogin:state.toLogin
+    toLogin: state.toLogin
 })
 
 const RegisterForm = Form.create({ name: 'register' })(RegistrationForm);
@@ -237,4 +205,4 @@ RegisterForm.propTypes = {
 }
 
 
-export default connect(mapStateToProps, { registerUser,registerToLogin })(withRouter(RegisterForm))
+export default connect(mapStateToProps, { registerUser, registerToLogin })(withRouter(RegisterForm))

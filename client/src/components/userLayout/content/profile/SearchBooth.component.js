@@ -5,7 +5,7 @@ import isEmpty from '../../../../utils/isEmpty'
 
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { addToBoothList ,changeToBoothList } from '../../../../actions/changeBoothList.action'
+import { addToBoothList, changeToBoothList } from '../../../../actions/changeBoothList.action'
 import { CHANGE_TO_BOOTHLIST } from '../../../../actions/types'
 
 
@@ -20,18 +20,11 @@ class SearchBoothForm extends Component {
             isOccupied: false,
             isSearching: false,
             isLoading: true,
-            searchError: {
-                boothId: '',
-                boothName: ''
-            },
-
             searchedBooth: {
-                boothId: '',
-                boothName: '',
-                boothSize: '',
-                isAuthorized: {
-
-                }
+                bName: '',
+                bOwner: '',
+                bSize: '',
+                isAuthorized: 'uncommited'
             }
         }
     }
@@ -53,33 +46,53 @@ class SearchBoothForm extends Component {
                     isSearching: true,
                     isLoading: true
                 })
-                const { boothId, boothName } = values
-                axios.get('/api/booth/search', { params: { boothId, boothName, cid: localStorage.currentExpoCID } })
-                    .then(res => {
-                        if (res.data.error) {
-                            this.setState({
-                                ...this.state,
-                                isLoading: false,
-                                searchError: res.data.error
-                            })
-                        } else {
-                            this.setState({
-                                ...this.state,
-                                isLoading: false,
-                                searchedBooth: res.data,
-                                searchError: {
-                                    boothId: '',
-                                    boothName: ''
+                const { bOwner, bName } = values
+                let eid = localStorage.getItem('current_eid')
+                if (eid) {
+                    axios.post(`/api/user/queryBoothInExpo/${eid}`, { bOwner, bName })
+                        .then(res => {
+                            if (res.data.booth) {
+                                const b = res.data.booth
+                                let isAuthorized = 'uncommited'
+                                if (b.auth && b.auth.company && b.auth.company.status) {
+                                    isAuthorized = b.auth.company.status
                                 }
-                            })
-                        }
-                    })
-                    .catch(err => {
-                        this.setState({
-                            ...this.state,
-                            searchError: { boothId: err.response.data }
+                                if (this.props.boothList.length) {
+                                    this.props.boothList.forEach(booth => {
+                                        if (booth.bid == b.bid) {
+                                            this.setState({
+                                                ...this.state,
+                                                isOccupied: true,
+                                            })
+                                        }
+                                    })
+                                }
+                                this.setState({
+                                    ...this.state,
+                                    isLoading: false,
+                                    searchedBooth: {
+                                        bName: b.bName.fullName,
+                                        bOwner: b.bOwner,
+                                        bSize: b.bSize,
+                                        isAuthorized
+                                    },
+                                })
+                            }else{
+                                this.setState({
+                                    ...this.state,
+                                    isLoading: false,
+                                })
+                            }
+
                         })
-                    })
+                        .catch(err => {
+                            this.setState({
+                                ...this.state,
+                                isLoading: false,
+                            })
+                            console.log(err)
+                        })
+                }
             }
         })
     }
@@ -110,7 +123,7 @@ class SearchBoothForm extends Component {
                                 this.props.addToBoothList(appendKey)
                                 let localBoothList = JSON.parse(localStorage.boothList)
                                 localBoothList.push(appendKey)
-                                localStorage.setItem('boothList',JSON.stringify(localBoothList))
+                                localStorage.setItem('boothList', JSON.stringify(localBoothList))
 
                             }
                         })
@@ -138,17 +151,24 @@ class SearchBoothForm extends Component {
     }
 
     render() {
-        const { Text, Title, Paragraph } = Typography
+        const { Text } = Typography
         const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
+        let btnText = '添加展位'
+        const { isAuthorized, isOccupied, searchedBooth, isLoading, isSearching } = this.state
+        if (isOccupied) {
+            btnText = '已添加'
+        } else if (isAuthorized !== 'uncommited' && !isOccupied) {
+            btnText = '已被其他用户锁定'
+        }
 
         // Only show error after a field is touched.
-        const boothIdError = isFieldTouched('boothId') && getFieldError('boothId');
-        const boothNameError = isFieldTouched('boothName') && getFieldError('boothName');
+        const bNameError = isFieldTouched('bName') && getFieldError('bName');
+        const bOwnerError = isFieldTouched('bOwner') && getFieldError('bOwner');
         return (
             <div>
                 <Form layout="inline" onSubmit={this.handleSubmit}>
-                    <Form.Item validateStatus={boothIdError ? 'error' : ''} help={boothIdError || ''}>
-                        {getFieldDecorator('boothId', {
+                    <Form.Item validateStatus={bNameError ? 'error' : ''} help={bNameError || ''}>
+                        {getFieldDecorator('bName', {
                             rules: [{ required: true, message: '请按照规则输入展位号!' }],
                         })(
                             <Input
@@ -161,8 +181,8 @@ class SearchBoothForm extends Component {
                             />,
                         )}
                     </Form.Item>
-                    <Form.Item validateStatus={boothNameError ? 'error' : ''} help={boothNameError || ''}>
-                        {getFieldDecorator('boothName', {
+                    <Form.Item validateStatus={bOwnerError ? 'error' : ''} help={bOwnerError || ''}>
+                        {getFieldDecorator('bOwner', {
                             rules: [{ required: true, message: '请按照规则输入正确信息!' }],
                         })(
                             <Input
@@ -182,12 +202,12 @@ class SearchBoothForm extends Component {
                     </Form.Item>
                 </Form>
                 <div style={{ margin: '20px 20px' }}>
-                    {!this.state.isSearching ?
+                    {!isSearching ?
                         <div style={{ height: '120px' }}>
-                            <Text type='secondary'  style={{ margin: '80px 30% ' ,fontSize:'18px',fontWeight:'bold'}}><Icon type="edit" />请输入搜索信息，查找并添加您的展位...</Text>
+                            <Text type='secondary' style={{ margin: '80px 30% ', fontSize: '18px', fontWeight: 'bold' }}><Icon type="edit" />请输入搜索信息，查找并添加您的展位...</Text>
                         </div>
                         :
-                        this.state.isLoading ?
+                        isLoading ?
                             <div style={{ width: '100%', height: '100%' }}>
                                 <Spin
                                     style={{ margin: ' 49px 45% 48px 45%' }}
@@ -195,20 +215,23 @@ class SearchBoothForm extends Component {
                                 </Spin>
                             </div>
                             :
-                            isEmpty(this.state.searchError.boothId) && isEmpty(this.state.searchError.boothName) ?
+                            searchedBooth.bName ?
                                 <div>
                                     <Descriptions title="展位信息" column={2}>
-                                        <Descriptions.Item label="展位号">{this.state.searchedBooth.boothId}</Descriptions.Item>
-                                        <Descriptions.Item label="展商名称">{this.state.searchedBooth.boothName}</Descriptions.Item>
-                                        <Descriptions.Item label="展位面积">{this.state.searchedBooth.boothSize} ㎡</Descriptions.Item>
+                                        <Descriptions.Item label="展位号">{searchedBooth.bName}</Descriptions.Item>
+                                        <Descriptions.Item label="展商名称">{searchedBooth.bName}</Descriptions.Item>
+                                        <Descriptions.Item label="展位面积">{searchedBooth.bSize} ㎡</Descriptions.Item>
                                         <Descriptions.Item label="其他">empty</Descriptions.Item>
                                     </Descriptions>
-                                    <Button style={{ marginLeft: '80%' }} onClick={e => this.addBooth(e)}><Icon type="plus" />添加展位</Button>
+                                    <Button style={{ marginLeft: '80%' }} onClick={e => this.addBooth(e)} disabled={isOccupied || isAuthorized ? true : false}>
+                                        <Icon type={isOccupied || isAuthorized ? 'stop' : 'plus'} />
+                                        {btnText}
+                                    </Button>
                                 </div> :
                                 <Empty
                                     style={{}}
                                     description={<span >
-                                        <Text type='secondary' style={{ fontSize: '20px', fontWeight: 'bold' }}>{this.state.searchError.boothId || this.state.searchError.boothName}</Text >
+                                        <Text type='secondary' strong>未查询到相应的展位！</Text>
                                         <br /><Text type='secondary'>请重新输入正确的信息，或者联系工作人员:027-8531 5811</Text>
                                     </span>}
                                 />
@@ -234,4 +257,4 @@ SearchBooth.propTypes = {
     changeToBoothList: PropTypes.func.isRequired
 }
 
-export default connect(mapStateToProps, { addToBoothList,changeToBoothList })(SearchBooth)
+export default connect(mapStateToProps, { addToBoothList, changeToBoothList })(SearchBooth)

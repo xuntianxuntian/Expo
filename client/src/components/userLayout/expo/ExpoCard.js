@@ -44,16 +44,16 @@ class ExpoCard extends Component {
         return ''
     }
     componentDidMount() {
-        console.log(this.props)
+
     }
     componentWillUpdate() {
-        console.log(this.props)
+
     }
 
     //点击进入展会按钮的回调
-    onInExpoClick = (e, cid) => {
+    onInExpoClick = (e, eid) => {
         e.preventDefault()
-        this.props.currentExpo(cid)
+        this.props.currentExpo(eid)
         let btn = document.getElementsByClassName("ant-btn-primary intoExpoClass")[0]
         if (e.target == btn) {
             return null
@@ -62,47 +62,51 @@ class ExpoCard extends Component {
             e.target.classList.add('ant-btn-primary')
             e.target.innerHTML = '当前展会'
             //切换展会时重新加载boothList
-            axios.get('/api/booth/listAll', { params: { cid } })
-            .then(
-                res => {
-                    console.log(res.data)
-                    if (res.data.length) {
-                        res.data.forEach((booth, index) => {
-                            booth['key'] = index
-                        })
-                        this.props.changeToBoothList(res.data)
+            axios.get(`/api/user/booth/list/${eid}`)
+                .then(
+                    res => {
+                        let boothList = []
+                        const booth = res.data.booth
+                        if (booth.length) {
+                            boothList = booth.map(
+                                (b, i) => {
+                                    return { ...b, key: i }
+                                }
+                            )
+                        }
+                        localStorage.setItem('boothList',JSON.stringify(boothList))
+                        this.props.changeToBoothList(boothList)
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        this.props.changeToBoothList([])
+                    })
+                } else {
+                    btn.classList.remove("ant-btn-primary")
+                    btn.classList.add("ant-btn-default")
+                    btn.innerHTML = '点击切换'
+                    if (e.target.classList.contains('ant-btn-primary')) {
+                        
+                        return null
                     } else {
-                        this.props.changeToBoothList({})
-                    }
-                })
-            .catch(err => {
-                console.log(err)
-                this.props.changeToBoothList([])
-            })
-        } else {
-            btn.classList.remove("ant-btn-primary")
-            btn.classList.add("ant-btn-default")
-            btn.innerHTML = '点击切换'
-            if (e.target.classList.contains('ant-btn-primary')) {
-
-                return null
-            } else {
-                e.target.classList.remove('ant-btn-default')
-                e.target.classList.add('ant-btn-primary')
-                e.target.innerHTML = '当前展会'
-                //切换展会时重新加载boothList
-                axios.get('/api/booth/listAll', { params: { cid } })
-                    .then(
-                        res => {
-                            console.log(res.data)
-                            if (res.data.length) {
-                                res.data.forEach((booth, index) => {
-                                    booth['key'] = index
-                                })
-                                this.props.changeToBoothList(res.data)
-                            } else {
-                                this.props.changeToBoothList({})
-                            }
+                        e.target.classList.remove('ant-btn-default')
+                        e.target.classList.add('ant-btn-primary')
+                        e.target.innerHTML = '当前展会'
+                        //切换展会时重新加载boothList
+                        axios.get(`/api/user/booth/list/${eid}`)
+                        .then(
+                            res => {
+                                let boothList = []
+                                const booth = res.data.booth
+                                if (booth.length) {
+                                    boothList = booth.map(
+                                        (b, i) => {
+                                            return { ...b, key: i }
+                                        }
+                                        )
+                                    }
+                            localStorage.setItem('boothList',JSON.stringify(boothList))
+                            this.props.changeToBoothList(boothList)
                         })
                     .catch(err => {
                         console.log(err.response)
@@ -135,8 +139,8 @@ class ExpoCard extends Component {
         const columns = [
             {
                 title: '展会名称',
-                dataIndex: 'expoName',
-                key: 'expoName',
+                dataIndex: 'eName',
+                key: 'eName',
                 render: text => <a href={this.getExpoUrl(text)} target='blank'>{text}</a>,
             },
             {
@@ -157,18 +161,19 @@ class ExpoCard extends Component {
             {
                 title: '展会选择',
                 key: 'action',
-                render: (text, record, index) => {
-                    if (isEmpty(localStorage.currentExpoCID) && index === 0) {
+                render: (_, record) => {
+                    let current_eid = localStorage.getItem('current_eid')
+                    if (isEmpty(current_eid)) {
                         return (<span>
-                            <Button type='primary' className='intoExpoClass' onClick={(e) => this.onInExpoClick(e, record.cid)}>当前展会</Button>
+                            <Button type='default' className='intoExpoClass' onClick={(e) => this.onInExpoClick(e, record.eid)}>当前展会</Button>
                         </span>)
-                    } else if (localStorage.currentExpoCID === record.cid) {
+                    } else if (current_eid === record.eid) {
                         return (<span>
-                            <Button type='primary' className='intoExpoClass' onClick={(e) => this.onInExpoClick(e, record.cid)}>当前展会</Button>
+                            <Button type='primary' className='intoExpoClass' onClick={(e) => this.onInExpoClick(e, record.eid)}>当前展会</Button>
                         </span>)
                     } else {
                         return (<span>
-                            <Button type='default' className='intoExpoClass' onClick={(e) => this.onInExpoClick(e, record.cid)}>点击切换</Button>
+                            <Button type='default' className='intoExpoClass' onClick={(e) => this.onInExpoClick(e, record.eid)}>点击切换</Button>
                         </span>)
                     }
 
@@ -180,8 +185,7 @@ class ExpoCard extends Component {
             expo.key = key
         })
         const data = this.props.expos
-        console.log(this.props.tableLoading)
-
+        console.log(data)
         return (
             <div>
                 <Table columns={columns} dataSource={data} pagination={pagination} loading={this.props.tableLoading} />

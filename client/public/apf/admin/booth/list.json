@@ -1,0 +1,72 @@
+[
+    {
+        "boothId": "A1A12",
+        "boothSize": "36",
+        "boothName": "武汉多人行展览",
+        "userId": "5daefe08770c3a0980017fef",
+        "expoId": "161656",
+        "auth": {
+            "authTime": "2020-05-26",
+            "status": "success",
+            "err": []
+        },
+        "files": {
+            "uploadTime": "2020-05-26",
+            "wtPic": "enTrust-1578234089754.png",
+            "xgPic": "enTrust-1578234089754.png",
+            "ccPic": "enTrust-1578234089754.png",
+            "czPic": "enTrust-1578234089754.png",
+            "dlPic": "enTrust-1578234089754.png",
+            "aqPic": "enTrust-1578234089754.png",
+            "qtPic": "enTrust-1578234089754.png"
+        },
+        "info": {
+            "commitTime": "2020-05-26",
+            "maxHt": 200,
+            "maxSp": 200,
+            "minTh": 200,
+            "totalEp": 200,
+            "cableTp": 200,
+            "bmTel": "15365615665",
+            "bmName": "15365615665",
+            "emName": "15365615665",
+            "emTel": "15365615665",
+            "email": "15365615@qq.com"
+        }
+    },
+    {
+        "boothId": "B2A36",
+        "boothSize": "72",
+        "boothName": "武汉抓三等奖",
+        "userId": "w234qweqweq017fef",
+        "expoId": "161656",
+        "auth": {
+            "authTime": "",
+            "status": "uncommited",
+            "err": []
+        },
+        "files": {
+            "uploadTime": "",
+            "wtPic": "",
+            "xgPic": "",
+            "ccPic": "",
+            "czPic": "",
+            "dlPic": "",
+            "aqPic": "",
+            "qtPic": ""
+        },
+        "info": {
+            "commitTime": "",
+            "maxHt": 0,
+            "maxSp": 0,
+            "minTh": 0,
+            "totalEp": 0,
+            "cableTp": 0,
+            "bmTel": "",
+            "bmName": "",
+            "emName": "",
+            "emTel": "",
+            "email": ""
+        }
+    }
+]

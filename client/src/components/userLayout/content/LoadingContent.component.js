@@ -9,7 +9,6 @@ class LoadingContent extends Component {
 
 
     render() {
-        console.log(this.props)
         return (
             <div style = {{position:'absolute',right:'37%',top:'47%'}}>
                 <Icon type="loading" style={{ fontSize: 24 }} spin />

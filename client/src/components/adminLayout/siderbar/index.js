@@ -71,8 +71,8 @@ class SiderBar extends React.Component {
 
                         >
                             <Menu.Item key="boothList"><Link to="/admin/boothList">展位信息汇总</Link></Menu.Item>
-                            <Menu.Item key="conpanyAuth"><Link to="/admin/conpanyAuth">施工单位资质审核</Link></Menu.Item>
-                            <Menu.Item key="boothAuth"><Link to="/admin/boothAuth">展位施工结构审核</Link></Menu.Item>
+                            <Menu.Item key="companyCheck"><Link to="/admin/companyCheck">施工单位资质审核</Link></Menu.Item>
+                            <Menu.Item key="boothCheck"><Link to="/admin/boothCheck">展位施工结构审核</Link></Menu.Item>
                             <Menu.Item key="other"><Link to="/admin/other">其他信息</Link></Menu.Item>
                         </SubMenu>
                         <SubMenu
@@ -85,8 +85,8 @@ class SiderBar extends React.Component {
                             }
                         >
                             <Menu.Item key="orderList"><Link to="/admin/orderList">订单列表</Link></Menu.Item>
-                            <Menu.Item key="orderUpdate"><Link to="/orderUpdate">订单修改</Link></Menu.Item>
-                            <Menu.Item key="orderConfirm"><Link to="/orderConfirm">订单确认</Link></Menu.Item>
+                            <Menu.Item key="orderCheck"><Link to="/admin/orderCheck">订单处理</Link></Menu.Item>
+                            {/* <Menu.Item key="orderConfirm"><Link to="/orderConfirm">订单确认</Link></Menu.Item> */}
                         </SubMenu>
                     </Menu>
                 </Sider>)

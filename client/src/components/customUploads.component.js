@@ -218,7 +218,7 @@ class CustomUploads extends Component {
                         <Icon type="upload" />上传文件
                     </Button>
                     <br />
-                    <div style={{width:'100%'}}>
+                    <div style={{ width: '100%' }}>
                         {fileNameList}
                     </div>
                 </Upload>
