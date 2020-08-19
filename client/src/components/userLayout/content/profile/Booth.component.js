@@ -17,6 +17,7 @@ class Booth extends Component {
         super(props)
         this.state = {
             isLoading: true,
+            boothList: []
         }
     }
 
@@ -44,12 +45,14 @@ class Booth extends Component {
                             this.props.changeToBoothList(boothList)
                             this.setState({
                                 ...this.state,
+                                boothList,
                                 isLoading: false,
                             })
                         } else {
                             this.props.changeToBoothList([])
                             this.setState({
                                 ...this.state,
+                                boothList: [],
                                 isLoading: false,
                             })
                         }
@@ -58,6 +61,7 @@ class Booth extends Component {
                     console.log(err)
                     this.setState({
                         ...this.state,
+                        boothList: [],
                         isLoading: false,
                     })
                 })
@@ -70,9 +74,8 @@ class Booth extends Component {
     render() {
 
         let dataSource = []
-        console.log(this.props.boothList)
-        if (this.props.boothList && this.props.boothList.length) {
-            dataSource = this.props.boothList.map((b, i) => {
+        if (this.state.boothList && this.state.boothList.length) {
+            dataSource = this.state.boothList.map((b, i) => {
                 let { bName, bSize, bOwner, auth } = b
                 let wtPic = b.file ? b.file.wtPic : ''
                 let { company } = auth
@@ -80,7 +83,7 @@ class Booth extends Component {
                     bSize, bOwner, bName,
                     authCompanyTime: company.authTime ? moment(company.authTime).format('YYYY-MM-DD HH:MM') : '-',
                     authCompanyStatus: company.status,
-                    authCompanyErr: company.err ? company.err:' ',
+                    authCompanyErr: company.err ? company.err : ' ',
                     wtPic, key: i
                 }
             })
@@ -146,7 +149,8 @@ class Booth extends Component {
                                 </Tag>
                                 <Tooltip title={record.authCompanyErr ? record.authCompanyErr : ''}>
                                     <span>查看详情</span>
-                                </Tooltip></span>
+                                </Tooltip>
+                            </span>
                         case 'success':
                             return <Tag color='green'>认证成功</Tag>
                         default:
@@ -214,11 +218,11 @@ class Booth extends Component {
 }
 
 const mapStateToProps = state => ({
-    boothList: state.boothList
+    // boothList: state.boothList
 })
 
 Booth.propTypes = {
-    boothList: PropTypes.array.isRequired,
+    // boothList: PropTypes.array.isRequired,
     addToBoothList: PropTypes.func.isRequired,
     changeToBoothList: PropTypes.func.isRequired
 }

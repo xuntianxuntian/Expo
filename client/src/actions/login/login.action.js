@@ -20,10 +20,9 @@ const loginUser = ({ email, password }, history) => async (dispatch) => {
                 const { current, list } = decode._doc.expos
                 localStorage.setItem('token', token)
                 localStorage.setItem('expos', JSON.stringify(list))
-                localStorage.setItem('current_eid', current)
                 //获取展位信息  将展位列表持久化到localStorage中
-                console.log(current)
                 if (current) {
+                    localStorage.setItem('current_eid', current)
                     axios.get(`/api/user/booth/list/${current}`)
                         .then(
                             res => {

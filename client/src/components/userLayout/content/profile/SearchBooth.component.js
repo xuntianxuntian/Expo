@@ -7,6 +7,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { addToBoothList, changeToBoothList } from '../../../../actions/changeBoothList.action'
 import { CHANGE_TO_BOOTHLIST } from '../../../../actions/types'
+import { loadOptions } from '@babel/core';
 
 
 function hasErrors(fieldsError) {
@@ -57,8 +58,9 @@ class SearchBoothForm extends Component {
                                 if (b.auth && b.auth.company && b.auth.company.status) {
                                     isAuthorized = b.auth.company.status
                                 }
-                                if (this.props.boothList.length) {
-                                    this.props.boothList.forEach(booth => {
+                                const boothList = JSON.parse(localStorage.getItem('boothList'))
+                                if (boothList && boothList.length) {
+                                    boothList.forEach(booth => {
                                         if (booth.bid == b.bid) {
                                             this.setState({
                                                 ...this.state,
@@ -77,7 +79,7 @@ class SearchBoothForm extends Component {
                                         isAuthorized
                                     },
                                 })
-                            }else{
+                            } else {
                                 this.setState({
                                     ...this.state,
                                     isLoading: false,
@@ -99,11 +101,10 @@ class SearchBoothForm extends Component {
 
     addBooth = (e) => {
         e.preventDefault()
-        console.log()
-        if (this.props.boothList.length) {
-            for (let i = 0; i < this.props.boothList.length; i++) {
-                console.log(this.props.boothList[i])
-                if (this.props.boothList[i].boothId === this.state.searchedBooth.boothId) {
+        const boothList = JSON.parse(localStorage.getItem('boothList'))
+        if (boothList && boothList.length) {
+            for (let i = 0; i < boothList.length; i++) {
+                if (boothList[i].boothId === this.state.searchedBooth.boothId) {
                     message.error('该展位已添加，请勿重复添加!')
                     break;
                 } else {
@@ -252,7 +253,7 @@ const mapStateToProps = state => ({
 })
 
 SearchBooth.propTypes = {
-    boothList: PropTypes.array.isRequired,
+    // boothList: PropTypes.array.isRequired,
     addToBoothList: PropTypes.func.isRequired,
     changeToBoothList: PropTypes.func.isRequired
 }
