@@ -34,9 +34,9 @@ class Booth extends Component {
             axios.get(`/api/user/booth/list/${eid}`)
                 .then(
                     res => {
-                        if (res.data.booth && res.data.booth.length) {
+                        if (res.data.boothList && res.data.boothList.length) {
                             let boothList = []
-                            boothList = res.data.booth.map((booth, index) => {
+                            boothList = res.data.boothList.map((booth, index) => {
                                 let b = { ...booth }
                                 delete b.bName
                                 b.bName = booth.bName.fullName

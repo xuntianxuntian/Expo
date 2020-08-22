@@ -23,6 +23,19 @@ db.booths.insert([
                 status:"success",
                 err:"",
             }
+        },
+        info:{
+            commitTime:1591185658415,
+            maxHt:312,
+            maxSp:342,
+            minTh:342,
+            totalEp:342,
+            cableTp:342,
+            bmName:"asdasdasd",
+            bmTel:"164616165165",
+            emName:"sjkagdakhsd",
+            emTel:"65165161964196",
+            email:"kjashdjk@qq.com",
         }
     },
     {
@@ -49,6 +62,19 @@ db.booths.insert([
                 status:"success",
                 err:"",
             }
+        },
+        info:{
+            commitTime:1591185658415,
+            maxHt:312,
+            maxSp:342,
+            minTh:342,
+            totalEp:342,
+            cableTp:342,
+            bmName:"asdasdasd",
+            bmTel:"164616165165",
+            emName:"sjkagdakhsd",
+            emTel:"65165161964196",
+            email:"kjashdjk@qq.com",
         }
     },{
         eid:"cfc0c518-eca2-4105-a3c3-44108890875f",
@@ -67,13 +93,32 @@ db.booths.insert([
             booth:{
                 authTime:1611999658415,
                 status:"failed",
-                err:"墙体宽度不能低于20cm",
+                err:[{
+                    name:"ccPic",
+                    message:"墙体尺寸不能低于20"
+                }],
             },
             company:{
                 authTime:1598666658415,
                 status:"failed",
-                err:"缺少资料",
+                err:[{
+                    name:"license",
+                    message:"资料不合格"
+                }],
             }
+        },
+        info:{
+            commitTime:1591185658415,
+            maxHt:312,
+            maxSp:342,
+            minTh:342,
+            totalEp:342,
+            cableTp:342,
+            bmName:"asdasdasd",
+            bmTel:"164616165165",
+            emName:"sjkagdakhsd",
+            emTel:"65165161964196",
+            email:"kjashdjk@qq.com",
         }
     },{
         eid:"cfc0c518-eca2-4105-a3c3-44108890875f",
@@ -90,7 +135,7 @@ db.booths.insert([
         eid:"cfc0c518-eca2-4105-a3c3-44108890875f",
         auth:{
             booth:{
-                authTime:1598155699915,
+                authTime:0,
                 status:"commited",
                 err:"",
             },
@@ -99,6 +144,19 @@ db.booths.insert([
                 status:"success",
                 err:"",
             }
+        },
+        info:{
+            commitTime:1591185658415,
+            maxHt:312,
+            maxSp:342,
+            minTh:342,
+            totalEp:342,
+            cableTp:342,
+            bmName:"asdasdasd",
+            bmTel:"164616165165",
+            emName:"sjkagdakhsd",
+            emTel:"65165161964196",
+            email:"kjashdjk@qq.com",
         }
     },{
         eid:"cfc0c518-eca2-4105-a3c3-44108890875f",
@@ -117,13 +175,29 @@ db.booths.insert([
             booth:{
                 authTime:1602885658415,
                 status:"failed",
-                err:"材质图没有标注清楚",
+                err:[{
+                    name:"czPic",
+                    message:"材质没有标注清楚"
+                }],
             },
             company:{
                 authTime:1592120368415,
                 status:"success",
                 err:"",
             }
+        },
+        info:{
+            commitTime:1591185658415,
+            maxHt:312,
+            maxSp:342,
+            minTh:342,
+            totalEp:342,
+            cableTp:342,
+            bmName:"asdasdasd",
+            bmTel:"164616165165",
+            emName:"sjkagdakhsd",
+            emTel:"65165161964196",
+            email:"kjashdjk@qq.com",
         }
     },{
         eid:"cfc0c518-eca2-4105-a3c3-44108890875f",
@@ -174,6 +248,19 @@ db.booths.insert([
                 status:"success",
                 err:"",
             }
+        },
+        info:{
+            commitTime:1591185658415,
+            maxHt:312,
+            maxSp:342,
+            minTh:342,
+            totalEp:342,
+            cableTp:342,
+            bmName:"asdasdasd",
+            bmTel:"164616165165",
+            emName:"sjkagdakhsd",
+            emTel:"65165161964196",
+            email:"kjashdjk@qq.com",
         }
     },{
         eid:"cfc0c518-eca2-4105-a3c3-44108890875f",
@@ -191,14 +278,30 @@ db.booths.insert([
         auth:{
             booth:{
                 authTime:1577785658415,
-                status:"succeess",
+                status:"success",
                 err:"",
             },
             company:{
                 authTime:1598885658415,
                 status:"failed",
-                err:"公司登记不够",
+                err:[{
+                    name:"level",
+                    message:"公司等级不够"
+                }],
             }
+        },
+        info:{
+            commitTime:1591185658415,
+            maxHt:312,
+            maxSp:342,
+            minTh:342,
+            totalEp:342,
+            cableTp:342,
+            bmName:"asdasdasd",
+            bmTel:"164616165165",
+            emName:"sjkagdakhsd",
+            emTel:"65165161964196",
+            email:"kjashdjk@qq.com",
         }
     },{
         eid:"cfc0c518-eca2-4105-a3c3-44108890875f",
@@ -216,7 +319,7 @@ db.booths.insert([
         auth:{
             booth:{
                 authTime:1598822258415,
-                status:"succeess",
+                status:"success",
                 err:"",
             },
             company:{
@@ -224,6 +327,19 @@ db.booths.insert([
                 status:"success",
                 err:"",
             }
+        },
+        info:{
+            commitTime:1591185658415,
+            maxHt:312,
+            maxSp:342,
+            minTh:342,
+            totalEp:342,
+            cableTp:342,
+            bmName:"asdasdasd",
+            bmTel:"164616165165",
+            emName:"sjkagdakhsd",
+            emTel:"65165161964196",
+            email:"kjashdjk@qq.com",
         }
     }
 ])

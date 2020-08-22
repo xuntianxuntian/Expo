@@ -8,6 +8,9 @@ import registerToLogin from '../../actions/register/registerToLogin.action'
 import { Tabs,Icon } from 'antd'
 
  class AuthComponent extends React.Component {
+     constructor(props){
+         super(props)
+     }
 
     changeTab = (tabKey)=>{
         this.props.registerToLogin(tabKey.toString())

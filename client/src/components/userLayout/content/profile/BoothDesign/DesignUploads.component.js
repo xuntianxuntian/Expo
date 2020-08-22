@@ -1,21 +1,34 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { List, Typography, Col, Row, Upload, Icon, Button, Cascader, message, } from 'antd'
+import { List, Typography, Col, Row, Upload, Icon, Button, Cascader, message, Modal } from 'antd'
 import axios from 'axios'
 import isEmpty from '../../../../../utils/isEmpty';
 import '../../../../../css/content/uploads.inlinestyle.css'
 
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import {switchToInfoTemp } from '../../../../../actions/changeBoothDesignTab.action'
+import { switchToInfoTemp } from '../../../../../actions/changeBoothDesignTab.action'
 
 import DesignInfoForm from './DesignInfoForm.component';
+
+
+function getBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}
+
 
 class DesignUploads extends Component {
 
     constructor(props) {
         super(props)
         this.state = {
+            previewVisible: false,
+            previewImage: '',
             unSubmitBooth: [],
             selectedBoothId: '',
             uploadDisabled: true,
@@ -34,9 +47,10 @@ class DesignUploads extends Component {
         // axios.get('/api/')
         let unSubmitBooth = []
         JSON.parse(localStorage.boothList).forEach(booth => {
-            console.log(booth.info)
-            if (booth.info == '' || booth.info === undefined || booth.info === null || booth.info === {})
+            if (!booth.auth || !booth.auth.booth || booth.auth.booth.status == 'uncommited' || (booth.auth.booth.err && booth.auth.booth.err.length)) {
+                console.log(booth.bName)
                 unSubmitBooth.push(booth)
+            }
         })
         if (unSubmitBooth.length > 0) {
             this.setState({
@@ -44,12 +58,43 @@ class DesignUploads extends Component {
                 unSubmitBooth
             })
 
-        } else {
-            this.setState({
-                ...this.state,
-                uploadDisabled: true
-            })
         }
+        console.log(unSubmitBooth)
+    }
+    componentDidUpdate(prevProps) {
+        console.log(this.props.boothToBeUpdate)
+        if (this.props.boothToBeUpdate && this.props.boothToBeUpdate !== prevProps.boothToBeUpdate) {
+            this.setState(
+                {
+                    ...this.state,
+                    selectedBoothId: this.props.boothToBeUpdate
+                }
+            )
+            // this.handleUpdateBooth(this.props.boothToBeUpdate)
+        }
+    }
+
+    handleUpdateBooth = (bid) => {
+        axios.get(`/api/user/booth/${bid}`).then(
+            res => {
+                console.log(res.data)
+                if (res.status == 200) {
+                    let b = res.data.booth
+                    b.bName = res.data.booth.bName.fullName
+                    this.state.unSubmitBooth.push(b)
+                    this.setState(
+                        {
+                            ...this.state,
+                            selectedBoothId: res.data.booth.bName
+                        }
+                    )
+                }
+            }
+        ).catch(
+            err => {
+                message.error({ content: err.response.data, key: 'updateboothFailed' })
+            }
+        )
     }
 
     //获取子组件的表单信息 获取form控件
@@ -58,30 +103,34 @@ class DesignUploads extends Component {
     }
     // booth selector onchange
     onBoothChange = value => {
+        console.log('111111111111111111111111111')
         if (!isEmpty(value)) {
-            return this.setState({
+            this.setState({
                 ...this.state,
                 selectedBoothId: value[0],
                 uploadDisabled: false
             })
+        } else {
+            this.setState({
+                ...this.state,
+                selectedBoothId: '',
+                uploadDisabled: true
+            })
         }
-        return this.setState({
-            ...this.state,
-            selectedBoothId: '',
-            uploadDisabled: true
-        })
+        
     }
+
 
     //提交审核  提交表单
     onHandleSubmitUploads = (e) => {
         // window.location = '/boothDesign'
         if (this.checkUploadContent()) {
-            this.child.props.form.validateFields((err, value) => {
+            this.child.props.form.validateFieldsAndScroll((err, value) => {
                 if (err) {
                     console.log('err')
                 } else {
                     console.log(value)
-                    axios.post('/api/booth/info', { data: { formData: value, boothId: this.state.selectedBoothId } })
+                    axios.post('https://www.mocky.io/v2/5cc8019d300000980a055e76', { data: { formData: value, boothId: this.state.selectedBoothId } })
                         .then(res => {
                             if (res.status == 200) {
                                 console.log(res.data)
@@ -120,10 +169,22 @@ class DesignUploads extends Component {
         return true
     }
 
+    handlePreview = async file => {
+        if (!file.url && !file.preview) {
+            file.preview = await getBase64(file.originFileObj);
+        }
+
+        this.setState({
+            previewImage: file.url || file.preview,
+            previewVisible: true,
+        });
+    };
+    handlePreviewCancel = () => this.setState({ previewVisible: false });
+
 
 
     render() {
-
+        console.log('render4')
         const { Text } = Typography
         const currentExpo = localStorage.currentExpo || '测试展会'
 
@@ -159,15 +220,15 @@ class DesignUploads extends Component {
 
         const options = this.state.unSubmitBooth.length > 0 ? this.state.unSubmitBooth.map(booth => {
             return {
-                value: booth.boothId,
-                label: booth.boothId
+                value: booth.bName,
+                label: booth.bName
             }
         }) : []
 
 
         // List Items uploads props 上传控件的基本通用属性
         const props2 = {
-            action: '/api/uploads/boothDesign',
+            action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
             listType: 'picture',
             className: 'upload-list-inline-boothDesign',
             headers: {
@@ -178,27 +239,24 @@ class DesignUploads extends Component {
         }
 
 
+        console.log(this.state.unSubmitBooth)
+        console.log(options)
 
 
         return (
             <div>
                 <div>
-                    <Row>
-                        <Col span={8}>
-                            <span style={{ fontSize: '15px', fontWeight: 'bold' }}>请选择展位: </span>
-                            <Cascader
-                                options={options}
-                                onChange={value => this.onBoothChange(value)}
-                                placeholder={this.state.unSubmitBooth.length > 0 ? ' 选择展位号' : ' 请先添加展位!'}
-                                disabled={this.state.unSubmitBooth.length > 0 ? false : true} /> 
-                                <Link to ='/booth' > 添加展位</Link>
-                        </Col>
-                        <Col span={4} offset={12}>
-                            <Text type='danger'>已完成填写？</Text>
-                            <Button onClick={e => this.onHandleSubmitUploads(e)}>提交审核</Button>
-                        </Col>
-                    </Row>
-                    <DesignInfoForm formDisabled={this.state.uploadDisabled} onRef={this.getChildDesignInfo} />
+
+                    <span style={{ fontSize: '14px' }}>选择展位: </span>
+                    <Cascader
+                        options={options}
+                        value={[this.state.selectedBoothId]}
+                        onChange={value => this.onBoothChange(value)}
+                        placeholder={this.state.unSubmitBooth.length > 0 ? ' 选择展位号' : ' 请先添加展位!'}
+                        disabled={this.state.unSubmitBooth.length > 0 ? false : true} />
+                    <Link to='/booth' > 添加展位</Link>
+
+                    <DesignInfoForm formDisabled={this.state.uploadDisabled} onRef={this.getChildDesignInfo} existedInfo={this.state.selectedBoothId} />
                     <div style={{ backgroundColor: '#f5f5f5', borderRadius: '10px', marginTop: '20px', padding: '20px 0 10px 10px' }}>
                         <Typography style={{ paddingTop: '20px', paddingLeft: '15px' }}>
                             <Text strong style={{ fontSize: '16px' }} >| 上传展位设计图:</Text>
@@ -225,6 +283,7 @@ class DesignUploads extends Component {
                                             description={
                                                 <Upload {...props2}
                                                     name={item.field}
+                                                    onPreview={this.handlePreview}
                                                     onChange={(info) => this.onUploadChange(info, item.field)}
                                                     beforeUpload={(file, fileList) => {
                                                         file.fieldName = item.field
@@ -269,6 +328,14 @@ class DesignUploads extends Component {
                         </div>
                     </div>
                 </div>
+                <Button
+                    type='primary'
+                    style={{ float: 'right', marginTop: '15px', marginBottom: '50px' }}
+                    onClick={e => this.onHandleSubmitUploads(e)}>
+                    提交审核</Button>
+                <Modal visible={this.state.previewVisible} footer={null} onCancel={this.handlePreviewCancel} className="picModel">
+                    <img alt="example" style={{ width: '100%' }} src={this.state.previewImage} />
+                </Modal>
             </div>
         )
     }
@@ -283,6 +350,6 @@ DesignUploads.propTypes = {
     switchToInfoTemp: PropTypes.func.isRequired,
 }
 
-export default connect(mapStateToProps, {switchToInfoTemp})(DesignUploads)
+export default connect(mapStateToProps, { switchToInfoTemp })(DesignUploads)
 
 

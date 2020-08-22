@@ -1,24 +1,22 @@
 import React, { Component } from 'react'
 import { Typography, Divider, Tabs } from 'antd'
 import store from '../../../../../store'
-import isEmpty from '../../../../../utils/isEmpty';
 import '../../../../../css/content/uploads.inlinestyle.css'
 
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import {switchToInfoTemp,switchToCheckList,switchToUpload } from '../../../../../actions/changeBoothDesignTab.action'
+import { switchToInfoTemp, switchToCheckList, switchToUpload } from '../../../../../actions/changeBoothDesignTab.action'
 
 import DesignUploads from './DesignUploads.component'
 import DesignCheckingList from './DesignCheckingList.component';
 import InfoTemplate from './InfoTemplate.component';
-import InfoTempForm from './InfoTempForm.component';
 
 class BoothDesign extends Component {
 
     constructor(props) {
         super(props)
         this.state = {
-
+            boothToBeUpdate: ''
         }
     }
 
@@ -28,19 +26,30 @@ class BoothDesign extends Component {
             type: "TOOGLE_SIDERBAR",
             payload: "boothDesign"
         })
-        console.log(this.props)
     }
 
     onTabClick = (key) => {
-        switch(key){
+        switch (key) {
             case '0':
                 return this.props.switchToUpload()
             case '1':
                 return this.props.switchToCheckList()
             case '2':
                 return this.props.switchToInfoTemp()
-            default :
+            default:
                 return null
+        }
+    }
+
+    onUpdateBooth = (bName) => {
+        if (bName){
+            console.log('childddddd')
+            this.setState(
+                {
+                    ...this.state,
+                    boothToBeUpdate:bName
+                }
+            )
         }
     }
 
@@ -65,19 +74,17 @@ class BoothDesign extends Component {
                 </Typography>
                 <Divider />
                 <div style={{ padding: '0 30px 10px 30px', width: '100%', backgroundColor: 'white' }}>
-                    <Tabs defaultActiveKey='1' onChange={e => this.onTabClick(e)} activeKey ={this.props.selectedTab.toString()}>
+                    <Tabs defaultActiveKey='1' onChange={e => this.onTabClick(e)} activeKey={this.props.selectedTab.toString()}>
                         <TabPane tab="展位申报" key="0">
-                            <DesignUploads />
+                            <DesignUploads boothToBeUpdate={this.state.boothToBeUpdate} />
                         </TabPane>
                         <TabPane tab="审核列表" key="1">
-                            <DesignCheckingList />
+                            <DesignCheckingList onRef={this.onUpdateBooth} />
                         </TabPane>
                         {/* <TabPane tab="完成审核列表" key="3">
                         </TabPane> */}
                         <TabPane tab="信息模板" key="2">
                             <InfoTemplate />
-                            <Title level={4} style={{ margin: '40px 0 20px 20px' }}>新增信息模板:</Title>
-                            <InfoTempForm />
                         </TabPane>
                     </Tabs>
                 </div>
@@ -95,8 +102,8 @@ BoothDesign.propTypes = {
     switchToInfoTemp: PropTypes.func.isRequired,
     switchToCheckList: PropTypes.func.isRequired,
     switchToUpload: PropTypes.func.isRequired,
-    
+
 }
 
-export default connect(mapStateToProps, {switchToInfoTemp,switchToCheckList,switchToUpload})(BoothDesign)
+export default connect(mapStateToProps, { switchToInfoTemp, switchToCheckList, switchToUpload })(BoothDesign)
 

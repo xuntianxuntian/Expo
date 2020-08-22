@@ -1,64 +1,226 @@
 import React, { Component } from "react";
-import { Table, Divider, Typography } from 'antd';
-
-
-import { connect } from 'react-redux'
-import PropTypes from 'prop-types'
-import { getInfoTempList, addToInfoTempList, deleteToInfoTempList, changeDefaultToInfoTempList } from '../../../../../actions/infoTemp.action'
-
+import { Table, Divider, Typography, message, Tooltip, Popconfirm, Button } from 'antd';
+import axios from 'axios'
+import InfoTempForm from "./InfoTempForm.component";
 
 class InfoTemplate extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            isLoading: true
+            isLoading: true,
+            templateList: [],
+            defTemp: {},
+            reloadList: false,
+            templateToBeUpdate: {},
+            showDeleteConfirmModal: false
         }
     }
 
     componentDidMount() {
-        this.props.getInfoTempList()
-            .then(res => {
-                this.setState({
-                    ...this.state,
-                    isLoading: false
-                })
-            }).catch(err => {
+        axios.get('/api/user/template')
+            .then(
+                res => {
+                    if (res.status === 200) {
+                        const templateList = res.data.templateList.map(
+                            (template, i) => {
+                                return {
+                                    ...template,
+                                    key: i
+                                }
+                            }
+                        )
+                        this.setState(
+                            {
+                                ...this.state,
+                                templateList,
+                                isLoading: false
+                            }
+                        )
+                        // await axios.get('/api/user/defTemp')
+                        //     .then(
+                        //         sres => {
+                        //             if (sres.status === 200) {
+
+                        //                 this.setState(
+                        //                     {
+                        //                         ...this.state,
+                        //                         defTemp: sres.data.template,
+                        //                         isLoading: false
+                        //                     }
+                        //                 )
+                        //             }
+                        //         }
+                        //     )
+                    }
+                }
+            ).catch(err => {
                 console.log(err)
-                this.setState({
-                    ...this.state,
-                    isLoading: false
+                this.setState(
+                    {
+                        ...this.state,
+                        isLoading: false
+                    }
+                )
+                message.error({ content: err.response.data, key: 'getTemplistFailed' })
+            })
+
+    }
+
+    onReloadTemp = (value) => {
+        if (value) {
+            axios.get('/api/user/template')
+                .then(
+                    async res => {
+                        if (res.status === 200) {
+                            const templateList = res.data.templateList.map(
+                                (template, i) => {
+                                    return {
+                                        ...template,
+                                        key: i
+                                    }
+                                }
+                            )
+                            this.setState(
+                                {
+                                    ...this.state,
+                                    templateList
+                                }
+                            )
+                            await axios.get('/api/user/defTemp')
+                                .then(
+                                    sres => {
+                                        if (sres.status === 200) {
+
+                                            this.setState(
+                                                {
+                                                    ...this.state,
+                                                    defTemp: sres.data.template,
+                                                    isLoading: false
+                                                }
+                                            )
+                                        }
+                                    }
+                                )
+                        }
+                    }
+                ).catch(err => {
+                    console.log(err)
+                    this.setState(
+                        {
+                            ...this.state,
+                            isLoading: false
+                        }
+                    )
+                    message.error({ content: err.response.data, key: 'getTemplistFailed' })
                 })
+        }
+    }
+
+    onDeleteTemp = (e, tid) => {
+        e.preventDefault()
+        this.setState(
+            {
+                ...this.state,
+                isLoading: true,
+                showDeleteConfirmModal: true
+            }
+        )
+        axios.delete(`/api/user/template?tid=${tid}`)
+            .then(
+                async res => {
+                    if (res.status === 200) {
+                        axios.get('/api/user/template').then(
+                            sres => {
+                                if (sres.status == 200) {
+                                    const templateList = sres.data.templateList.map(
+                                        (template, i) => {
+                                            return {
+                                                ...template,
+                                                key: i
+                                            }
+                                        }
+                                    )
+                                    this.setState({
+                                        ...this.state,
+                                        templateList,
+                                        isLoading: false
+                                    })
+                                    message.success({ content: res.data, key: 'deleteTempSuccess' })
+                                }
+                            }
+                        )
+                    }
+                }
+            ).catch(err => {
+                this.setState(
+                    {
+                        ...this.state,
+                        isLoading: false
+                    }
+                )
+                message.error({ content: err.response.data, key: 'deleteTempFailed' })
             })
     }
 
-    onSetDeafaultTemp = (e, info) => {
+    onCancleDelete = (e) => {
+        this.setState(
+            {
+                ...this.state,
+                showDeleteConfirmModal: false
+            }
+        )
+    }
+
+    onUpdateTemp = (e, template) => {
         e.preventDefault()
-        console.log(info)
+        window.location.hash = ''
+        window.location.hash = 'tempForm'
         this.setState({
             ...this.state,
-            isLoading: true
+            templateToBeUpdate: template
         })
-        this.props.infoTempList.forEach(infoTemp => {
-            if (infoTemp.id === info.id) {
-                infoTemp.isdefault = true
-            } else {
-                infoTemp.isdefault = false
+    }
+
+    onSetDefTemp = (e, info) => {
+        e.preventDefault()
+        this.setState(
+            {
+                ...this.state,
+                isLoading: true
             }
-        })
-        this.props.changeDefaultToInfoTempList(this.props.infoTempList)
-            .then(res => {
-                this.setState({
-                    ...this.state,
-                    isLoading: false
+        )
+        axios.put('/api/user/defTemp', { tid: info.tid })
+            .then(
+                res => {
+                    if (res.status === 200) {
+                        this.setState(
+                            {
+                                ...this.state,
+                                isLoading: false
+                            }
+                        )
+                        localStorage.setItem('default_template', info.tid)
+                        message.success({ content: res.data.message, key: 'updateDefTempSuccess' })
+                        this.onReloadTemp(true)
+                    }
+                }
+            ).catch(
+                err => {
+                    this.setState(
+                        {
+                            ...this.state,
+                            isLoading: false
+                        }
+                    )
+                    message.error({ content: err.response.data, key: 'updateDefTempFailed' })
                 })
-            }).catch(err => console.log(err))
+
     }
 
 
     render() {
-
-        const { Text } = Typography
-
+        const { defTemp, templateList, isLoading } = this.state
+        const { Text, Title } = Typography
         const columns = [
             {
                 title: '模板名称',
@@ -70,72 +232,90 @@ class InfoTemplate extends Component {
                 title: '施工负责人',
                 dataIndex: 'bmName',
                 key: 'bmName',
+                render: (value, record) => {
+                    return (<Tooltip title={record.bmTel}>
+                        <span>{value}</span>
+                    </Tooltip>)
+                }
             },
             {
                 title: '电力负责人',
                 dataIndex: 'emName',
                 key: 'emName',
+                render: (value, record) => {
+                    return (<Tooltip title={record.emTel}>
+                        <span>{value}</span>
+                    </Tooltip>)
+                }
             },
             {
                 title: '预留邮箱',
                 key: 'email',
                 dataIndex: 'email',
-
             },
             {
-                title: '操作',
+                title: '',
                 key: 'action',
+                dataIndex: '',
                 render: (text, record, index) => {
                     let info = record
-                    if (record.isdefault) {
-                        return (
-                            <span>
-                                <a><Text disabled code>当前默认模板</Text></a>
-                                <Divider type="vertical" />
-                                <a>修改</a>
-                                <Divider type="vertical" />
+                    return (
+                        <span>
+                            {localStorage.getItem('default_template') && record.tid == localStorage.getItem('default_template') ?
+                                (
+                                    <Button type="primary" size="small" disabled>
+                                        默认模板
+                                    </Button>
+                                )
+                                :
+                                (
+                                    <Button type="primary" size="small" loading={this.state.isLoading} onClick={e => this.onSetDefTemp(e, info)}>
+                                        设为默认
+                                    </Button>
+                                )
+                            }
+                            <Divider type="vertical" />
+                            <a onClick={e => this.onUpdateTemp(e, info)}>修改</a>
+                            <Divider type="vertical" />
+                            <Popconfirm
+                                title="你确定要删除这个模板吗?"
+                                onConfirm={(e) => this.onDeleteTemp(e, info.tid)}
+                                onCancel={this.onCancleDelete}
+                                okText="确定"
+                                cancelText="取消"
+                            >
                                 <a>删除</a>
-                            </span>
-                        )
-                    } else {
-                        return (
-                            <span>
-                                <a onClick={e => this.onSetDeafaultTemp(e, info)}>设为默认模板</a>
-                                <Divider type="vertical" />
-                                <a>修改</a>
-                                <Divider type="vertical" />
-                                <a>删除</a>
-                            </span>
-                        )
-                    }
+                            </Popconfirm>
+                        </span>
+                    )
+
                 },
             },
         ]
 
 
         return (
-            <div style={{margin:'0 20px'}}>
-                <Table columns={columns} dataSource={this.props.infoTempList}
-                    loading={this.state.isLoading}
+            <div style={{ margin: '0 20px' }}>
+                <Title level={4} style={{ margin: '10px 0 5px 20px', fontSize: '16px' }}>我的信息模板:</Title>
+                <Divider />
+                <Table columns={columns} dataSource={templateList}
+                    loading={isLoading}
                     pagination={false}
                     bordered={true}
                 />
+                <a name="tempForm" href="#tempForm">
+
+                    <Title level={4} style={{ margin: '40px 0 5px 20px' }}>新增信息模板:</Title>
+                </a>
+                <Divider />
+                <InfoTempForm onRef={this.onReloadTemp} templateToBeUpdate={this.state.templateToBeUpdate} />
+
             </div>
         )
     }
 }
 
 
-const mapStateToProps = state => ({
-    infoTempList: state.infoTempList
-})
 
-InfoTemplate.propTypes = {
-    infoTempList: PropTypes.array.isRequired,
-    getInfoTempList: PropTypes.func.isRequired,
-    addToInfoTempList: PropTypes.func.isRequired,
-    deleteToInfoTempList: PropTypes.func.isRequired,
-    changeDefaultToInfoTempList: PropTypes.func.isRequired
-}
 
-export default connect(mapStateToProps, { changeDefaultToInfoTempList, getInfoTempList, addToInfoTempList, deleteToInfoTempList })(InfoTemplate)
+export default InfoTemplate

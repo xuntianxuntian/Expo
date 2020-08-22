@@ -5,8 +5,9 @@ import isEmpty from '../../../../../utils/isEmpty'
 
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { getInfoTempList } from '../../../../../actions/infoTemp.action'
-import {switchToInfoTemp } from '../../../../../actions/changeBoothDesignTab.action'
+import { getTempList } from '../../../../../actions/infoTemp.action'
+import { switchToInfoTemp } from '../../../../../actions/changeBoothDesignTab.action'
+import axios from 'axios'
 
 class AdvancedSearchForm extends React.Component {
 
@@ -14,43 +15,71 @@ class AdvancedSearchForm extends React.Component {
         super(props)
         this.state = {
             isLoading: true,
-            defaultTempValue: {
-                maxHt: '',
-                maxSp: '',
-                minTh: '',
-                totalEp: '',
-                cableTp: '',
-                bmName: '',
-                bmTel: '',
-                emName: '',
-                emTel: '',
-                email: '',
-            }
+            defTemp: {},
+            templateList: [],
+            selectedTempId: ''
         }
     }
 
 
     componentDidMount() {
         this.props.onRef(this)
-        this.props.getInfoTempList().then(
-            infoTempList => {
-                infoTempList.forEach(
-                    infoTemp => {
-                        const {maxHt,maxSp,minTh,totalEp,cableTp,bmName,bmTel,emName,emTel,email} = infoTemp
-                        if (infoTemp.isDefault) {
-                            this.setState({
+        axios.get('/api/user/template').then(
+            (res) => {
+                if (res.status == 200) {
+                    this.setState(
+                        {
+                            ...this.state,
+                            templateList: res.data.templateList
+                        }
+                    )
+                    if (localStorage.getItem('default_template') && res.data.templateList.length) {
+                        let defTemp = {}
+                        res.data.templateList.forEach(
+                            temp => {
+                                if (temp.tid == localStorage.getItem('default_template')) {
+                                    defTemp = temp
+                                }
+                            }
+                        )
+                        this.setState(
+                            {
                                 ...this.state,
-                                defaultTempValue: {maxHt,maxSp,minTh,totalEp,cableTp,bmName,bmTel,emName,emTel,email}
-                            })
+                                defTemp,
+                                isLoading: false
+                            }
+                        )
+                    }
+
+                }
+            }
+        )
+    }
+    componentDidUpdate(prevProps) {
+        if (this.props.existedInfo && this.props.existedInfo !== prevProps.existedInfo) {
+            const boothList = JSON.parse(localStorage.getItem('boothList'))
+            if (boothList && boothList.length) {
+                boothList.forEach(
+                    booth => {
+                        console.log(booth.bName)
+                        if (booth.bName == this.props.existedInfo && booth.info) {
+                            console.log('22222222222222')
+                            this.onAutoSetFieldsValue(booth.info)
                         }
                     }
                 )
-                this.setState({
-                    ...this.state,
-                    isLoading: false,
-                })
             }
-        )
+            this.setState(
+                {
+                    ...this.state,
+                    selectedBoothId: this.props.boothToBeUpdate
+                }
+            )
+        }
+    }
+    onAutoSetFieldsValue = (info) => {
+        const { maxHt, maxSp, minTh, totalEp, cableTp, bmName, bmTel, emName, emTel, email } = info
+        this.props.form.setFieldsValue({ maxHt, maxSp, minTh, totalEp, cableTp, bmName, bmTel, emName, emTel, email })
     }
 
 
@@ -122,22 +151,28 @@ class AdvancedSearchForm extends React.Component {
 
 
     onTempChange = value => {
-        console.log(value)
-        if (!isEmpty(value)) {
-            return this.setState({
-                ...this.state,
-                uploadDisabled: false
-            })
-        }
-        return this.setState({
+        this.setState({
             ...this.state,
-            uploadDisabled: true
+            selectedTempId: value
         })
     }
 
-    onDefaultTempButtonClick = (e) => {
+    onAutoFillFormClick = (e) => {
         e.preventDefault()
-        this.props.form.setFieldsValue(this.state.defaultTempValue, () => console.log('SetFormValue callback'))
+        let tempToBeFilled = {}
+        if (this.state.templateList.length) {
+            this.state.templateList.forEach(
+                (temp) => {
+                    if (this.state.selectedTempId == temp.tid) {
+                        tempToBeFilled = temp
+                    }
+                }
+            )
+            const { maxHt, maxSp, minTh, totalEp, cableTp, bmName, bmTel, emName, emTel, email } = tempToBeFilled
+            this.onAutoSetFieldsValue({ maxHt, maxSp, minTh, totalEp, cableTp, bmName, bmTel, emName, emTel, email })
+        } else {
+            window.location.reload()
+        }
     }
 
     OnSwitchToInfoTempTab = (e) => {
@@ -146,47 +181,59 @@ class AdvancedSearchForm extends React.Component {
     }
 
     render() {
+        const { templateList, isLoading } = this.state
 
         const { Text } = Typography
-        const options = [{
-            value: 'sssss',
-            label: 'sssss'
-        }]
-
-        return (
-            <div style={{ backgroundColor: '#f5f5f5', borderRadius: '10px', marginTop: '20px', padding: '20px 0 10px 10px' }}>
-                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                    <Button disabled={this.props.formDisabled} onClick={e => this.onDefaultTempButtonClick(e)} >使用默认模板填写</Button>&nbsp;&nbsp;或&nbsp;&nbsp;
-                    <Cascader options={options} onChange={value => this.onTempChange(value)} placeholder='用其他模板填写' disabled={this.props.formDisabled} />
-                    <span style={{ marginLeft: '10px' }}>没有模板?<a onClick = {e => this.OnSwitchToInfoTempTab(e)}>去添加</a></span>
+        const options = templateList.length ? templateList.map(
+            temp => {
+                if (temp.tid == localStorage.getItem('default_template')) {
+                    return { value: temp.tid, label: '默认模板' }
+                }
+                return { value: temp.tid, label: temp.tempName }
+            }
+        ) : []
+        return this.state.isLoading ? (<div>dasdasdasd</div>) :
+            (<div style={{ backgroundColor: '#f5f5f5', borderRadius: '10px', marginTop: '20px', padding: '20px 0 10px 10px' }}>
+                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                    <Text strong style={{ fontSize: '16px', paddingLeft: '15px', marginRight: '8px' }} >| 展位结构:</Text>
+                    <Cascader
+                        className="selectTemplateCascader"
+                        options={options}
+                        onChange={value => this.onTempChange(value)}
+                        placeholder='选择模板'
+                        disabled={this.props.formDisabled} />
+                    <Button
+                        size='small'
+                        style={{ marginLeft: '5px' }}
+                        disabled={this.props.formDisabled}
+                        onClick={e => this.onAutoFillFormClick(e)}
+                        type='primary'>
+                        一键填写
+                    </Button>
+                    <span style={{ marginLeft: '10px' }}><a onClick={e => this.OnSwitchToInfoTempTab(e)}>添加模板</a></span>
                 </div>
                 <Form onSubmit={this.handleSearch}>
-                    <Typography style={{ paddingTop: '20px', paddingLeft: '15px' }}>
-                        <Text strong style={{ fontSize: '16px' }} >| 展位结构:
-                        </Text>
-                    </Typography>
+
                     <Row gutter={24} style={{ padding: '10px 40px' }}>{this.getFieldsA()}</Row>
                     <Typography style={{ paddingTop: '5px', paddingLeft: '15px' }}>
                         <Text strong style={{ fontSize: '16px' }} >| 展位联系人:</Text>
                     </Typography>
                     <Row gutter={24} style={{ padding: '10px 40px' }}>{this.getFieldsB()}</Row>
                 </Form>
-            </div>
+            </div>)
 
-        )
+
     }
 }
 
 const DesignInfoForm = Form.create({ name: 'advanced_search' })(AdvancedSearchForm);
 
 const mapStateToProps = state => ({
-    infoTempList: state.infoTempList
 })
 
 DesignInfoForm.propTypes = {
-    infoTempList: PropTypes.array.isRequired,
-    getInfoTempList: PropTypes.func.isRequired,
+
     switchToInfoTemp: PropTypes.func.isRequired,
 }
 
-export default connect(mapStateToProps, { switchToInfoTemp ,getInfoTempList})(DesignInfoForm)
+export default connect(mapStateToProps, { switchToInfoTemp })(DesignInfoForm)
