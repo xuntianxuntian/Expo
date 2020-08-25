@@ -6,6 +6,7 @@ import '../../../../../css/content/uploads.inlinestyle.css'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { switchToInfoTemp, switchToCheckList, switchToUpload } from '../../../../../actions/changeBoothDesignTab.action'
+import { getBidFromList} from '../../../../../actions/getBidFromList.action'
 
 import DesignUploads from './DesignUploads.component'
 import DesignCheckingList from './DesignCheckingList.component';
@@ -16,11 +17,12 @@ class BoothDesign extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            boothToBeUpdate: ''
+           
         }
     }
 
     componentDidMount() {
+        console.log(this.state)
         localStorage.setItem('sideLocation', window.location.pathname.split('/')[1])
         store.dispatch({
             type: "TOOGLE_SIDERBAR",
@@ -43,13 +45,7 @@ class BoothDesign extends Component {
 
     onUpdateBooth = (bName) => {
         if (bName){
-            console.log('childddddd')
-            this.setState(
-                {
-                    ...this.state,
-                    boothToBeUpdate:bName
-                }
-            )
+            this.props.getBidFromList(bName)
         }
     }
 
@@ -75,8 +71,8 @@ class BoothDesign extends Component {
                 <Divider />
                 <div style={{ padding: '0 30px 10px 30px', width: '100%', backgroundColor: 'white' }}>
                     <Tabs defaultActiveKey='1' onChange={e => this.onTabClick(e)} activeKey={this.props.selectedTab.toString()}>
-                        <TabPane tab="展位申报" key="0">
-                            <DesignUploads boothToBeUpdate={this.state.boothToBeUpdate} />
+                        <TabPane tab="展位申报" key="0" forceRender={true}>
+                            <DesignUploads />
                         </TabPane>
                         <TabPane tab="审核列表" key="1">
                             <DesignCheckingList onRef={this.onUpdateBooth} />
@@ -102,8 +98,8 @@ BoothDesign.propTypes = {
     switchToInfoTemp: PropTypes.func.isRequired,
     switchToCheckList: PropTypes.func.isRequired,
     switchToUpload: PropTypes.func.isRequired,
-
+    getBidFromList:PropTypes.func.isRequired,
 }
 
-export default connect(mapStateToProps, { switchToInfoTemp, switchToCheckList, switchToUpload })(BoothDesign)
+export default connect(mapStateToProps, { switchToInfoTemp, switchToCheckList, switchToUpload ,getBidFromList})(BoothDesign)
 

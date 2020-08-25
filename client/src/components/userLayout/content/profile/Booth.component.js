@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
-import { Table, Tooltip, Tag, Upload, message, Button, Icon, Typography, Spin, Empty } from 'antd'
+import { Table, Tooltip, Tag, Upload, message, Button, Icon, Typography, Modal, Spin, List, Avatar, Divider } from 'antd'
 import axios from 'axios'
 import { Link } from 'react-router-dom'
 import store from '../../../../store'
 import moment from 'moment'
 import SearchBooth from './SearchBooth.component'
+import pics from '../../../../bg_02.jpg'
 
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
@@ -17,7 +18,14 @@ class Booth extends Component {
         super(props)
         this.state = {
             isLoading: true,
-            boothList: []
+            boothList: [],
+            showPreviewModal: false,
+            modalClass: '',
+            isModalLoading: false,
+            modalTitle: '',
+            modalShowPic: false,
+            previewImage: '',
+            companyAuthError: [{}]
         }
     }
 
@@ -42,23 +50,22 @@ class Booth extends Component {
                                 b.bName = booth.bName.fullName
                                 return { ...b, key: index }
                             })
-                            this.props.changeToBoothList(boothList)
+                            localStorage.setItem('boothList', JSON.stringify(boothList))
                             this.setState({
                                 ...this.state,
                                 boothList,
                                 isLoading: false,
                             })
                         } else {
-                            this.props.changeToBoothList([])
                             this.setState({
                                 ...this.state,
                                 boothList: [],
                                 isLoading: false,
                             })
+                            localStorage.setItem('boothList', JSON.stringify([]))
                         }
                     })
                 .catch(err => {
-                    console.log(err)
                     this.setState({
                         ...this.state,
                         boothList: [],
@@ -68,29 +75,92 @@ class Booth extends Component {
         }
     }
 
+    onPreviewWtPic = (e, record) => {
+        e.preventDefault()
+        console.log(record)
+        this.onPreviewModal('pic', record)
+    }
+
+    onPreviewFailMessage = (e, record) => {
+        e.preventDefault()
+        console.log(record)
+        this.onPreviewModal('message', record)
+    }
+
+    onPreviewModal = (type, record) => {
+        let r = record
+        if (type == 'pic') {
+            this.setState(
+                {
+                    ...this.state,
+                    showPreviewModal: true,
+                    modalClass: 'picModel',//当加载玩图片后 将class切换到picModalLoading
+                    isModalLoading: true,
+                    modalTitle: '委托书预览',
+                    modalShowPic: true
+                }
+            )
+            console.log('render pic')
+
+        } else {
+            const companyAuthError = r.authCompanyErr.map((e, i) => { return { ...e, key: i + 1 } })
+            this.setState(
+                {
+                    ...this.state,
+                    showPreviewModal: true,
+                    modalClass: '',
+                    // isModalLoading: true,
+                    modalTitle: '审核失败详情',
+                    companyAuthError,
+                }
+            )
+            console.log('render message')
+        }
+
+
+    }
+
+    onPreviewCancel = () => {
+        this.setState(
+            {
+                ...this.state,
+                showPreviewModal: false,
+                modalClass: '',
+                isModalLoading: false,
+                modalTitle: '',
+                modalShowPic: false,
+                previewImage: '',
+                companyAuthError: [{}]
+            }
+        )
+    }
+
+    onReUploadWtPic = (e, record) => {
+        e.preventDefault()
+        console.log(record)
+    }
+
 
 
 
     render() {
-
+        // let that = this
+        const { Title, Paragraph, Text } = Typography
         let dataSource = []
         if (this.state.boothList && this.state.boothList.length) {
             dataSource = this.state.boothList.map((b, i) => {
-                let { bName, bSize, bOwner, auth } = b
-                let wtPic = b.file ? b.file.wtPic : ''
-                let { company } = auth
+                let { bName, bSize, bOwner, auth, bid } = b
                 return {
-                    bSize, bOwner, bName,
-                    authCompanyTime: company.authTime ? moment(company.authTime).format('YYYY-MM-DD HH:MM') : '-',
-                    authCompanyStatus: company.status,
-                    authCompanyErr: company.err ? company.err : ' ',
-                    wtPic, key: i
+                    bSize, bOwner, bName, bid,
+                    authCompanyTime: auth.authTime ? moment(auth.authTime).format('YYYY-MM-DD HH:MM') : '-',
+                    authCompanyStatus: auth.status,
+                    authCompanyErr: auth.err ? auth.err : [],
+                    key: i,
+                    wtPic: ['commited', 'failed', 'success'].includes(auth.status)
                 }
             })
         }
-        console.log(dataSource)
 
-        const { Title, Paragraph, Text } = Typography
         const props = {
             listType: 'text',
             name: 'yyzz',
@@ -100,10 +170,11 @@ class Booth extends Component {
             },
             onChange(info) {
                 if (info.file.status !== 'uploading') {
-                    console.log(info.file, info.fileList);
+                    console.log(info);
                 }
                 if (info.file.status === 'done') {
                     message.success(`${info.file.name} 上传成功`);
+
                 } else if (info.file.status === 'error') {
                     message.error(`${info.file.name} 上传失败`);
                 }
@@ -132,27 +203,51 @@ class Booth extends Component {
                 render: text => <Text>{text} ㎡</Text>,
             },
             {
-                title: '认证状态',
+                title: () => (<Tooltip title="展商委托搭建的委托证明(盖双方公章)">委托证明<Icon type="question-circle" style={{ marginLeft: '2px', fontSize: '10px' }} /></Tooltip>),
+                key: 'wtPic',
+                dataIndex: 'wtPic',
+                align: 'center',
+                render: (wtPic, record) => {
+                    const errFieldArr = record.authCompanyErr.map(err => err.field)
+                    if (wtPic && errFieldArr.includes('wtPic')) {
+                        return <Text>
+                            <a onClick={(e) => this.onPreviewWtPic(e, record)}>查看</a>
+                            <Divider type='vertical' />
+                            <a onClick={(e) => this.onReUploadWtPic(e, record)}>重新上传</a>
+                        </Text>
+                    } else if (wtPic && (record.authCompanyStatus == "success" || record.authCompanyStatus == "commited" || record.authCompanyStatus == "failed")) {
+                        return <Text><a onClick={(e) => this.onPreviewWtPic(e, record)}>查看</a></Text>
+                    } else {
+                        return <Upload {...props}>
+                            <Button>
+                                上传证明
+                            </Button>
+                        </Upload>
+                    }
+
+                },
+            },
+            {
+                title: '委托审核',
                 key: 'authCompanyStatus',
                 dataIndex: 'authCompanyStatus',
                 align: 'center',
                 render: (authCompanyStatus, record) => {
+                    const r = record
                     switch (authCompanyStatus) {
                         case 'uncommited':
-                            return <Tag color='red'>未认证</Tag>
+                            return <Tag color='red'>未提交</Tag>
                         case 'commited':
-                            return <Tag color='blue'>认证中</Tag>
+                            return <Tag color='blue'>审核中</Tag>
                         case 'failed':
                             return <span>
                                 <Tag color='grey'>
-                                    认证失败
+                                    失败
+                                    <a><Icon type="question-circle" style={{ marginLeft: '2px', fontSize: '10px' }} onClick={(e, record) => this.onPreviewFailMessage(e, r)} /></a>
                                 </Tag>
-                                <Tooltip title={record.authCompanyErr ? record.authCompanyErr : ''}>
-                                    <span>查看详情</span>
-                                </Tooltip>
                             </span>
                         case 'success':
-                            return <Tag color='green'>认证成功</Tag>
+                            return <Tag color='green'>已通过</Tag>
                         default:
                             return ''
                     }
@@ -168,29 +263,12 @@ class Booth extends Component {
                     <Text>{text}</Text>
                 ),
             },
-            {
-                title: '上传委托书',
-                key: 'wtPic',
-                dataIndex: 'wtPic',
-                align: 'center',
-                render: (wtPic, record) => {
-                    if (wtPic) {
-                        return <Text>已上传</Text>
-                    } else {
-                        return <Upload {...props}>
-                            <Button>
-                                <Icon type="upload" />
-                            </Button>
-                        </Upload>
-                    }
 
-                },
-            },
         ]
 
 
         return (
-            <div>
+            <div style={{ backgroundColor: 'white' }}>
                 <Typography style={{ paddingTop: '20px', paddingLeft: '15px' }}>
                     <Title level={4} >| 展位认证</Title>
                     <Paragraph style={{ textIndent: '8px' }}>
@@ -207,11 +285,58 @@ class Booth extends Component {
                     locale={{ emptyText: '还未添加展会!' }}
                     style={{
                         margin: '0 20px',
-                        height: '300px'
+                        backgroundColor: 'white',
+                        // height: '300px',
                     }}
                     pagination={{ position: 'bottom', pageSize: 5 }}
                 // bordered
                 />
+                <Modal
+                    title={this.state.modalTitle}
+                    visible={this.state.showPreviewModal}
+                    footer={null}
+                    onCancel={this.onPreviewCancel}
+                // className={this.state.modalClass}
+                >
+                    <Spin tip="Loading..." spinning={this.state.isModalLoading}>
+                        {this.state.modalShowPic ? (
+                            <div className={this.state.modalClass}>
+                                <img alt="example" style={{ width: '100%' }}
+                                    src={pics}
+                                />
+                            </div>
+
+
+                        ) : (
+                                <div style={{ padding: '10px 20px' }}>
+                                    <List
+                                        itemLayout="horizontal"
+                                        dataSource={this.state.companyAuthError}
+                                        renderItem={item => {
+                                            let err = item
+                                            return (
+                                                <List.Item>
+                                                    <List.Item.Meta
+                                                        avatar={<Avatar style={{ backgroundColor: 'red', verticalAlign: 'middle' }} size="large">
+                                                            {item.key}
+                                                        </Avatar>}
+                                                        title={<span>错误项项目:<span style={{ fontWeight: 'bold' }}>{item.field}</span></span>}
+                                                        description={
+                                                            <Paragraph
+                                                            >
+                                                                {item.message}
+                                                            </Paragraph>
+                                                        }
+                                                    />
+                                                </List.Item>
+                                            )
+                                        }
+                                        }
+                                    />
+                                </div>
+                            )}
+                    </Spin>
+                </Modal>
             </div>
         )
     }
@@ -223,8 +348,6 @@ const mapStateToProps = state => ({
 
 Booth.propTypes = {
     // boothList: PropTypes.array.isRequired,
-    addToBoothList: PropTypes.func.isRequired,
-    changeToBoothList: PropTypes.func.isRequired
 }
 
 export default connect(mapStateToProps, { addToBoothList, changeToBoothList })(Booth)

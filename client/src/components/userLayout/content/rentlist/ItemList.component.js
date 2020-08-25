@@ -16,6 +16,7 @@ class ItemList extends Component {
 
 
     componentDidMount() {
+        console.log('asdasdadadasdasd')
         localStorage.setItem('sideLocation', window.location.pathname.split('/')[1])
         store.dispatch({
             type: "TOOGLE_SIDERBAR",

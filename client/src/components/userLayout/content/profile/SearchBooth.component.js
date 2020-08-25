@@ -1,13 +1,10 @@
 import { Form, Icon, Input, Button, Typography, Tooltip, Empty, Descriptions, message, Spin } from 'antd'
 import React, { Component } from 'react'
 import axios from 'axios'
-import isEmpty from '../../../../utils/isEmpty'
 
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { addToBoothList, changeToBoothList } from '../../../../actions/changeBoothList.action'
-import { CHANGE_TO_BOOTHLIST } from '../../../../actions/types'
-import { loadOptions } from '@babel/core';
 
 
 function hasErrors(fieldsError) {
@@ -254,8 +251,7 @@ const mapStateToProps = state => ({
 
 SearchBooth.propTypes = {
     // boothList: PropTypes.array.isRequired,
-    addToBoothList: PropTypes.func.isRequired,
-    changeToBoothList: PropTypes.func.isRequired
+    
 }
 
-export default connect(mapStateToProps, { addToBoothList, changeToBoothList })(SearchBooth)
+export default connect(mapStateToProps, { })(SearchBooth)

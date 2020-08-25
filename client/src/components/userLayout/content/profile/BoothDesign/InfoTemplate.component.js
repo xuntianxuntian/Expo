@@ -36,21 +36,6 @@ class InfoTemplate extends Component {
                                 isLoading: false
                             }
                         )
-                        // await axios.get('/api/user/defTemp')
-                        //     .then(
-                        //         sres => {
-                        //             if (sres.status === 200) {
-
-                        //                 this.setState(
-                        //                     {
-                        //                         ...this.state,
-                        //                         defTemp: sres.data.template,
-                        //                         isLoading: false
-                        //                     }
-                        //                 )
-                        //             }
-                        //         }
-                        //     )
                     }
                 }
             ).catch(err => {

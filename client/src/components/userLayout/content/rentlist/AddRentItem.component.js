@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
-import {  Card, Descriptions, Button, Icon, Typography, Tabs, Cascader } from 'antd'
-import isEmpty from '../../../../utils/isEmpty'
+import { Card, Descriptions, Button, Icon, Tabs, Cascader, message, Tag } from 'antd'
+import axios from 'axios'
+import jwt_decode from 'jwt-decode'
+import moment from 'moment'
 
 import electric from '../../../../electric.png'
 import waterandgas from '../../../../waterandgas.png'
@@ -11,19 +13,64 @@ class AddRentItem extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            selectBoothName: '',
-            selectBoothId: '',
-            itemProvider:{
-                elec:[],//220-15s 220-5 220-15 380-15 380-20 380-30 380-60 380-100 
-                water:[],//
-                gas:[],//8L 20L 30L 50L
-                network:[]//5M  10M 20M 50M 100M
-            }
+            isLoading: true,
+            boothList: [],
+            selectbid: '',
+            orderExpire: 0,
+            isSpecial: false,
+            itemProvider: {
+                elec: [],//220-15s 220-5 220-15 380-15 380-20 380-30 380-60 380-100 
+                water: [],//
+                gas: [],//8L 20L 30L 50L
+                network: []//5M  10M 20M 50M 100M
+            },
+            fee: {}
         }
     }
 
     componentDidMount() {
-
+        const eid = localStorage.getItem('current_eid')
+        if (eid) {
+            axios.get(`api/user/expo/fee/${eid}`).then(
+                res => {
+                    if (res.status == 200) {
+                        axios.get(`/api/user/booth/list/${eid}`).then(
+                            sres => {
+                                if (sres.status == 200) {
+                                    let b = sres.data.boothList.map((booth, i) => { return { ...booth, key: i } })
+                                    const uid = jwt_decode(localStorage.getItem('token')).uid
+                                    if (res.data.fee.specList.includes(uid)) {
+                                        this.setState(
+                                            {
+                                                ...this.state,
+                                                isLoading: false,
+                                                fee: res.data.fee,
+                                                boothList: b,
+                                                isSpecial: true,
+                                                orderExpire: res.data.fee.orderExpire
+                                            }
+                                        )
+                                    } else {
+                                        this.setState(
+                                            {
+                                                ...this.state,
+                                                isLoading: false,
+                                                fee: res.data.fee,
+                                                boothList: b,
+                                                orderExpire: res.data.fee.orderExpire
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        )
+                    }
+                }
+            ).catch(err => message.error({ content: 'err.response.data', key: 'cantGetFeeOrBoothList' }))
+        } else {
+            message.error({ content: '请选择当前要参加的展会!', key: 'cantFindEid' })
+            window.location.replace('/myExpo')
+        }
     }
 
 
@@ -37,59 +84,131 @@ class AddRentItem extends Component {
 
 
     onBoothChange = value => {
-        console.log(this.state.selectBoothName)
-
-        for (let i = 0; i < this.props.boothList.length; i++) {
-            if (this.props.boothList[i].boothId == value[0]) {
-                return this.setState({
-                    ...this.state,
-                    selectBoothName: this.props.boothList[i].boothName
-                })
-            }
-        }
-        if (!isEmpty(value[0])) {
-            return this.setState({
+        console.log(value)
+        if (value[0]) {
+            this.setState({
                 ...this.state,
-                boothId: value[0],
-                uploadDisabled: false
+                selectbid: value[0],
             })
         }
-        return this.setState({
-            ...this.state,
-            uploadDisabled: true
-        })
+
     }
 
 
     render() {
 
+        const { selectbid, fee, boothList, orderExpire } = this.state
         const { TabPane } = Tabs
-        const { Title, Paragraph, Text } = Typography
         const { Meta } = Card
-
-
-        const options = [{value:'656',label:'asdasd'},{value:'asdas',label:'asdqwdq'}]
-        
-        // this.props.boothList.map(booth => {
-        //     return {
-        //         value: booth.boothId,
-        //         label: booth.boothId
-        //     }
-        // })
-
-        //base cost table jsx
-
-        const baseCost = (
-            <div style={{ margin: '30px 0 5px 0', width: '100%' }}>
-                <Descriptions title={'展位号：A2A02'} bordered='true'>
-                    <Descriptions.Item label="展位面积" span={2}>{72} ㎡</Descriptions.Item>
-                    <Descriptions.Item label="施工押金">{10000} 元</Descriptions.Item>
-                    <Descriptions.Item label="施工管理费" span={2}>{2000}元</Descriptions.Item>
-                    <Descriptions.Item label="审图费">{1200} 元</Descriptions.Item>
-                    <Descriptions.Item label="证件费">{200}元</Descriptions.Item>
-                </Descriptions>
-            </div>
+        let seletedbooth = null
+        let customBase = ''
+        let baseCost = ''
+        let authColor = ''
+        let designColor = ''
+        let authText = '-'
+        let designText = '-'
+        console.log(seletedbooth)
+        boothList.some(
+            booth => {
+                if (booth.bid == selectbid) {
+                    seletedbooth = booth
+                    return true
+                }
+            }
         )
+
+        const options = this.state.boothList.map(
+            booth => {
+                return { value: booth.bid, label: booth.bName.fullName }
+            }
+        )
+        if (seletedbooth && fee.base && fee.custom) {
+            authColor = seletedbooth.auth.status == 'commited' ? 'blue' : seletedbooth.auth.status == 'success' ? 'green' : seletedbooth.auth.status == 'failed' ? 'red' : ''
+            designColor = seletedbooth.design.status == 'commited' ? 'blue' : seletedbooth.design.status == 'success' ? 'green' : seletedbooth.design.status == 'failed' ? 'red' : ''
+            authText = seletedbooth.auth.status == 'commited' ? '审核中' : seletedbooth.auth.status == 'success' ? '已通过' : seletedbooth.auth.status == 'failed' ? '审核失败' : "未提交资料"
+            designText = seletedbooth.design.status == 'commited' ? '审核中' : seletedbooth.design.status == 'success' ? '已通过' : seletedbooth.design.status == 'failed' ? '审核失败' : "未提交资料"
+            const now = moment.now()
+            customBase = fee.custom && fee.custom.length ? fee.custom.map(
+                (item, i) => {
+                    if (item.itemType == 'base') {
+                        let cost = this.state.isSpecial ?
+                            now > orderExpire ?
+                                item.feeType.feeNum.exceedSpec :
+                                item.feeType.feeNum.normalSpec :
+                            now > orderExpire ?
+                                item.feeType.feeNum.exceed :
+                                item.feeType.feeNum.normal
+                        return (
+                            <Descriptions.Item label={`${item.itemName}`} key={'custom' + i.toString()}>
+                                {item.useSize ? parseInt(cost) * parseFloat(seletedbooth.bSize) : cost}元
+                            </Descriptions.Item>
+                        )
+                    }
+                }) : null
+            baseCost = [{ key: 'management', name: '特装管理费' }, { key: 'deposite', name: '押金' }].map(
+                (item, i) => {
+                    if (item.key == 'management') {
+                        let cost = this.state.isSpecial ?
+                            now > orderExpire ?
+                                fee.base.management.exceedSpec :
+                                fee.base.management.normalSpec :
+                            now > orderExpire ?
+                                fee.base.management.exceed :
+                                fee.base.management.normal
+                        return (
+                            <Descriptions.Item label={`${item.name}`} key={'baseManagement' + i.toString()}>
+                                {parseInt(cost) * parseFloat(seletedbooth.bSize)}元
+                            </Descriptions.Item>
+                        )
+                    } else {
+                        //将押金的所属范围找出来，确定选定展位的押金数
+                        //生成数组 在推入当前选择展位的面积数据，再进行排序，最后就行循环检测，有等于当前展位面积或者下一个 就是应该缴纳的押金
+                        let depositeIndex
+                        let deposite
+                        const depositeRange = fee.base.deposite.feeType.map(
+                            (dep) => {
+                                const strlength = dep.fieldName.length
+                                return { size: parseInt(dep.fieldName.slice(1, strlength - 1)), feeNum: dep.feeNum }
+                            }
+                        )
+                        depositeRange.push({ size: seletedbooth.bSize })
+                        depositeRange.sort(function (a, b) { return a.size - b.size }).some(
+                            (value, i) => {
+                                if (value.size == seletedbooth.bSize) {
+                                    depositeIndex = i
+                                    return true
+                                }
+                            }
+                        )
+                        if (depositeRange[depositeIndex].feeNum) {
+                            deposite = depositeRange[depositeIndex].feeNum
+                        } else {
+                            deposite = depositeRange[depositeIndex + 1].feeNum
+                        }
+                        let cost = this.state.isSpecial ?
+                            now > orderExpire ?
+                                deposite.exceedSpec :
+                                deposite.normalSpec :
+                            now > orderExpire ?
+                                deposite.exceed :
+                                deposite.normal
+
+
+                        return (
+                            <Descriptions.Item label={`${item.name}`} key={'baseDeposite' + i.toString()}>
+                                {cost}元
+                            </Descriptions.Item>
+                        )
+                    }
+                }
+            )
+        }
+
+
+
+
+
+
 
 
         //electric Card jsx
@@ -161,18 +280,27 @@ class AddRentItem extends Component {
             />
         </Card>)
 
-
+        console.log(baseCost.toString())
         return (
-            <div style={{padding:'10px 40px'}}>
+            <div style={{ padding: '10px 40px' ,marginBottom:'20px'}}>
                 <Cascader
                     options={options}
                     onChange={value => this.onBoothChange(value)}
                     placeholder='请选择展位'
                     notFoundContent='暂时还未添加展位' />
-                <Tabs defaultActiveKey="1" onChange={this.onTabChange} style={{ height: '380px' }}>
+                <Tabs defaultActiveKey="1" onChange={this.onTabChange} >
                     <TabPane tab="展位基本费用" key="baseCost">
-                        {baseCost}
-                        <Button type='primary' style={{ float: 'right', marginRight: '20%', marginTop: '10px' }}>加入清单</Button>
+                        <div style={{ margin: '30px 0 5px 0', width: '100%' }}>
+                            <Descriptions title={`展位号 : ${seletedbooth ? seletedbooth.bName.fullName : ' - '}`} bordered='true' column={2}>
+                                <Descriptions.Item label="展商名称" span={1}>{seletedbooth ? seletedbooth.bOwner : ' - '}</Descriptions.Item>
+                                <Descriptions.Item label="展位面积" span={1}>{seletedbooth ? seletedbooth.bSize : ' - '} ㎡</Descriptions.Item>
+                                <Descriptions.Item label="展位委托" span={1}><Tag color={authColor}>{authText}</Tag></Descriptions.Item>
+                                <Descriptions.Item label="报馆审核" span={1}><Tag color={designColor}>{designText}</Tag></Descriptions.Item>
+                                {baseCost}
+                                {customBase}
+                            </Descriptions>
+                        </div>
+                        <Button type='primary' style={{ float: 'right', marginRight: '1%', marginTop: '25px' }}>加入清单</Button>
                     </TabPane>
                     <TabPane tab="电力租赁" key="electric">
                         {electricCard}

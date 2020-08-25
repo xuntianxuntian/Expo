@@ -5,3 +5,8 @@
 .picModel{
     width:665px!important
 }
+
+.picModelLoading{
+    width:665px!important;
+    height: 450px!important;
+}

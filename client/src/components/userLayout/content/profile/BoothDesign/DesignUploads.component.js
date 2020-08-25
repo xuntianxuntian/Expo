@@ -44,30 +44,28 @@ class DesignUploads extends Component {
     }
 
     componentDidMount() {
-        // axios.get('/api/')
         let unSubmitBooth = []
         JSON.parse(localStorage.boothList).forEach(booth => {
             if (!booth.auth || !booth.auth.booth || booth.auth.booth.status == 'uncommited' || (booth.auth.booth.err && booth.auth.booth.err.length)) {
-                console.log(booth.bName)
                 unSubmitBooth.push(booth)
             }
         })
         if (unSubmitBooth.length > 0) {
             this.setState({
                 ...this.state,
-                unSubmitBooth
+                unSubmitBooth,
             })
 
         }
-        console.log(unSubmitBooth)
     }
     componentDidUpdate(prevProps) {
-        console.log(this.props.boothToBeUpdate)
-        if (this.props.boothToBeUpdate && this.props.boothToBeUpdate !== prevProps.boothToBeUpdate) {
+        console.log(prevProps)
+        if (this.props.bidtoBeUpdated && this.props.bidtoBeUpdated !== prevProps.bidtoBeUpdated) {
             this.setState(
                 {
                     ...this.state,
-                    selectedBoothId: this.props.boothToBeUpdate
+                    selectedBoothId: this.props.bidtoBeUpdated,
+                    uploadDisabled: false,
                 }
             )
             // this.handleUpdateBooth(this.props.boothToBeUpdate)
@@ -103,21 +101,20 @@ class DesignUploads extends Component {
     }
     // booth selector onchange
     onBoothChange = value => {
-        console.log('111111111111111111111111111')
         if (!isEmpty(value)) {
             this.setState({
                 ...this.state,
                 selectedBoothId: value[0],
-                uploadDisabled: false
+                uploadDisabled: false,
             })
         } else {
             this.setState({
                 ...this.state,
                 selectedBoothId: '',
-                uploadDisabled: true
+                uploadDisabled: true,
             })
         }
-        
+
     }
 
 
@@ -242,7 +239,7 @@ class DesignUploads extends Component {
         console.log(this.state.unSubmitBooth)
         console.log(options)
 
-
+        console.log('seletedId' + this.state.selectedBoothId)
         return (
             <div>
                 <div>
@@ -343,11 +340,13 @@ class DesignUploads extends Component {
 
 const mapStateToProps = state => ({
     boothList: state.boothList,
+    bidtoBeUpdated:state.bidFromList
 })
 
 DesignUploads.propTypes = {
     boothList: PropTypes.array.isRequired,
     switchToInfoTemp: PropTypes.func.isRequired,
+    bidtoBeUpdated:PropTypes.string.isRequired,
 }
 
 export default connect(mapStateToProps, { switchToInfoTemp })(DesignUploads)

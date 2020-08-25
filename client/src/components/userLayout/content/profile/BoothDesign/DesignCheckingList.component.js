@@ -28,8 +28,8 @@ class DesignCheckingList extends Component {
                     let tableList = []
                     console.log(res)
                     res.data.boothList.forEach((b, i) => {
-                        const { bName, bOwner, auth,bid } = b
-                        tableList.push({ bName: bName.fullName, bOwner, auth, key: i,bid })
+                        const { bName, bOwner, design,bid } = b
+                        tableList.push({ bName: bName.fullName, bOwner, design, key: i,bid })
                     })
                     this.setState({
                         ...this.state,
@@ -75,28 +75,28 @@ class DesignCheckingList extends Component {
         }
 
         const expandedRowRender = (record, index, indent, expanded) => {
-            if (record.auth.booth.status == 'uncommited') {
+            if (record.design.status == 'uncommited') {
                 return <span>请先提交审核资料。</span>
-            } else if (record.auth.booth.status == 'commited') {
+            } else if (record.design.status == 'commited') {
                 return <span>正在审核中，请耐心等待....</span>
-            } else if (record.auth.booth.status == 'success') {
+            } else if (record.design.status == 'success') {
                 return <span>本展位施工搭建审核已通过!</span>
             }
 
             const columns = [
-                { title: '未通过项目', dataIndex: 'name', key: '1', width: '300px', },
+                { title: '未通过项目', dataIndex: 'field', key: '1', width: '300px', },
 
                 { title: '未通过原因', dataIndex: 'message', key: '2', },
             ]
-            const errorNameMap = {
+            const errorfieldMap = {
                 xgPic: '施工效果图', ccPic: '施工尺寸图', czPic: '施工材质图', dlPic: '施工电路图', aqPic: '安全责任书', qtPic: '其他证件',
                 maxHt: '展位最大高度', maxSp: '单体结构最大宽度', minTh: '支撑结构最小厚度', totalEp: '用电总功率', cableTp: '电料电缆规格', email: '邮箱',
             }
             const data = []
-            if (record.auth && record.auth.booth && record.auth.booth.err && record.auth.booth.err.length) {
-                record.auth.booth.err.forEach((error, i) => {
-                    const name = errorNameMap[error.name]
-                    data.push({ name, message: error.message, key: i })
+            if (record.design && record.design.err && record.design.err.length) {
+                record.design.err.forEach((error, i) => {
+                    const field = errorfieldMap[error.field]
+                    data.push({ field, message: error.message, key: i })
                 })
             }
 
@@ -108,18 +108,18 @@ class DesignCheckingList extends Component {
             { title: '展位号', dataIndex: 'bName', key: 'bName', },
             { title: '展位名称', dataIndex: 'bOwner', key: 'bOwner', },
             {
-                title: '提交时间', dataIndex: 'auth', key: 'authTime',
+                title: '提交时间', dataIndex: 'design', key: 'authTime',
                 render: (value) => {
-                    const time = value.booth.authTime || 0
+                    const time = value.uploadTime || 0
                     if (time == 0) return <Text> - </Text>
                     let timeStr = moment(time).format('YYYY-MM-DD HH:MM')
                     return <Text> {timeStr}</Text>
                 }
             },
             {
-                title: '审核结果', dataIndex: 'auth', key: 'status',
+                title: '审核结果', dataIndex: 'design', key: 'status',
                 render: (value, record) => {
-                    const status = value.booth.status || 'uncommited'
+                    const status = value.status || 'uncommited'
                     switch (status) {
                         case 'uncommited':
                             return <Tag color='red'>未上传资料</Tag>
@@ -140,10 +140,10 @@ class DesignCheckingList extends Component {
             },
             {
                 title: '提交',
-                dataIndex: 'auth',
+                dataIndex: 'design',
                 key: 'action',
                 render: (value, record) => {
-                    const status = value.booth.status || 'uncommited'
+                    const status = value.status || 'uncommited'
                     switch (status) {
                         case 'uncommited':
                             return <Button onClick={e => { onTableButtonClick(e, record.bName) }}>上传</Button>

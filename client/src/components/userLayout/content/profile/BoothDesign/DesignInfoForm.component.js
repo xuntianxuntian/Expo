@@ -1,11 +1,8 @@
-import { Form, Row, Col, Input, Cascader, Typography, Button } from 'antd'
+import { Form, Row, Col, Input, Cascader, Typography, Button, Spin } from 'antd'
 import React from 'react'
-
-import isEmpty from '../../../../../utils/isEmpty'
 
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { getTempList } from '../../../../../actions/infoTemp.action'
 import { switchToInfoTemp } from '../../../../../actions/changeBoothDesignTab.action'
 import axios from 'axios'
 
@@ -61,10 +58,10 @@ class AdvancedSearchForm extends React.Component {
             if (boothList && boothList.length) {
                 boothList.forEach(
                     booth => {
-                        console.log(booth.bName)
-                        if (booth.bName == this.props.existedInfo && booth.info) {
-                            console.log('22222222222222')
-                            this.onAutoSetFieldsValue(booth.info)
+                        if (booth.bName == this.props.existedInfo && booth.design && booth.design.info && booth.design.info.maxHt) {
+                            this.onAutoSetFieldsValue(booth.design.info)
+                        } else if (booth.bName == this.props.existedInfo && !(booth.design && booth.design.info && booth.design.info.maxHt)) {
+                            this.props.form.resetFields()
                         }
                     }
                 )
@@ -192,7 +189,12 @@ class AdvancedSearchForm extends React.Component {
                 return { value: temp.tid, label: temp.tempName }
             }
         ) : []
-        return this.state.isLoading ? (<div>dasdasdasd</div>) :
+        return isLoading ?
+            (
+                <div style={{ backgroundColor: '#f5f5f5', borderRadius: '10px', width: '100', height: '310px', textAlign: 'center', paddingTop: '120px', marginTop: '20px' }}>
+                    <Spin size="large" />
+                </div>
+            ) :
             (<div style={{ backgroundColor: '#f5f5f5', borderRadius: '10px', marginTop: '20px', padding: '20px 0 10px 10px' }}>
                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                     <Text strong style={{ fontSize: '16px', paddingLeft: '15px', marginRight: '8px' }} >| 展位结构:</Text>
@@ -232,7 +234,6 @@ const mapStateToProps = state => ({
 })
 
 DesignInfoForm.propTypes = {
-
     switchToInfoTemp: PropTypes.func.isRequired,
 }
 
